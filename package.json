@@ -1,0 +1,39 @@
+{
+  "name": "earnbutton",
+  "version": "1.0.0",
+  "description": "EarnButton — One-tap DeFi yield on Base, powered by YO Protocol",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@rainbow-me/rainbowkit": "^2.2.10",
+    "@tanstack/react-query": "^5.90.21",
+    "@types/node": "^25.4.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@yo-protocol/core": "^1.0.9",
+    "@yo-protocol/react": "^1.0.6",
+    "autoprefixer": "^10.4.27",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "next": "^14.2.35",
+    "numeral": "^2.0.6",
+    "postcss": "^8.5.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "swr": "^2.4.1",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3",
+    "viem": "^2.47.1",
+    "wagmi": "^2.19.5"
+  }
+}

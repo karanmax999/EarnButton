@@ -1,0 +1,85 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // Robinhood-inspired color palette
+        primary: {
+          50: '#e6fff9',
+          100: '#b3fff0',
+          200: '#80ffe6',
+          300: '#4dffdd',
+          400: '#1affd3',
+          500: '#00e6b8', // Main brand color
+          600: '#00b38f',
+          700: '#008066',
+          800: '#004d3d',
+          900: '#001a14',
+        },
+        success: {
+          50: '#e6fff4',
+          100: '#b3ffe0',
+          200: '#80ffcc',
+          300: '#4dffb8',
+          400: '#1affa4',
+          500: '#00e68a',
+          600: '#00b36b',
+          700: '#00804c',
+          800: '#004d2d',
+          900: '#001a0e',
+        },
+        danger: {
+          50: '#ffe6e6',
+          100: '#ffb3b3',
+          200: '#ff8080',
+          300: '#ff4d4d',
+          400: '#ff1a1a',
+          500: '#e60000',
+          600: '#b30000',
+          700: '#800000',
+          800: '#4d0000',
+          900: '#1a0000',
+        },
+        warning: {
+          50: '#fff9e6',
+          100: '#ffecb3',
+          200: '#ffdf80',
+          300: '#ffd24d',
+          400: '#ffc51a',
+          500: '#e6b000',
+          600: '#b38900',
+          700: '#806200',
+          800: '#4d3b00',
+          900: '#1a1400',
+        },
+        neutral: {
+          50: '#f9fafb',
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
+        },
+      },
+      borderRadius: {
+        'xl': '1rem',
+        '2xl': '1.5rem',
+      },
+      boxShadow: {
+        'soft': '0 2px 8px rgba(0, 0, 0, 0.08)',
+        'medium': '0 4px 16px rgba(0, 0, 0, 0.12)',
+        'strong': '0 8px 32px rgba(0, 0, 0, 0.16)',
+      },
+    },
+  },
+  plugins: [],
+}
