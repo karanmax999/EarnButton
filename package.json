@@ -35,5 +35,9 @@
     "typescript": "^5.9.3",
     "viem": "^2.47.1",
     "wagmi": "^2.19.5"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.1.7"
   }
 }

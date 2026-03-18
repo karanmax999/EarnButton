@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import Image from 'next/image'
 import VaultInfo from '@/components/VaultInfo'
 import Dashboard from '@/components/Dashboard'
 import EarnModal from '@/components/EarnModal'
@@ -92,63 +93,64 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
-        <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0a0f1e]/90 backdrop-blur-md">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-            <div className="flex items-center gap-6">
-              <button
-                type="button"
-                onClick={() => setCurrentView('home')}
-                className="text-lg font-black tracking-tight text-white hover:text-teal-400 transition-colors"
-              >
-                EARNBUTTON
-              </button>
-              {isConnected && (
-                <nav className="hidden sm:flex items-center gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentView('home')}
-                    className={`text-sm font-medium transition-colors pb-0.5 border-b-2 ${currentView === 'home' ? 'text-teal-400 border-teal-400' : 'text-white/60 border-transparent hover:text-white'}`}
-                  >
-                    Home
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCurrentView('dashboard')}
-                    className={`text-sm font-medium transition-colors pb-0.5 border-b-2 ${currentView === 'dashboard' ? 'text-teal-400 border-teal-400' : 'text-white/60 border-transparent hover:text-white'}`}
-                  >
-                    Dashboard
-                  </button>
-                </nav>
-              )}
-            </div>
-            <ConnectButton />
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0a0f1e]/90 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-6">
+            <button
+              type="button"
+              onClick={() => setCurrentView('home')}
+              className="flex items-center hover:opacity-80 transition-opacity"
+              aria-label="EarnButton home"
+            >
+              <Image src="/logo.svg" alt="EarnButton" width={160} height={36} priority />
+            </button>
+            {isConnected && (
+              <nav className="hidden sm:flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => setCurrentView('home')}
+                  className={`text-sm font-medium transition-colors pb-0.5 border-b-2 ${currentView === 'home' ? 'text-teal-400 border-teal-400' : 'text-white/60 border-transparent hover:text-white'}`}
+                >
+                  Home
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentView('dashboard')}
+                  className={`text-sm font-medium transition-colors pb-0.5 border-b-2 ${currentView === 'dashboard' ? 'text-teal-400 border-teal-400' : 'text-white/60 border-transparent hover:text-white'}`}
+                >
+                  Dashboard
+                </button>
+              </nav>
+            )}
           </div>
-        </header>
+          <ConnectButton />
+        </div>
+      </header>
 
-        {isConnected && currentView === 'dashboard' ? (
-          <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-            <Dashboard
-              userAddress={address!}
-              onDeposit={() => openModal(YO_VAULTS[0].address)}
-              onDepositSuccess={(refetch) => setRefetchDashboard(() => refetch)}
-            />
-          </div>
-        ) : (
-          <LandingPage
-            isConnected={isConnected}
-            onOpenModal={openModal}
-            apyMap={apyMap}
+      {isConnected && currentView === 'dashboard' ? (
+        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+          <Dashboard
+            userAddress={address!}
+            onDeposit={() => openModal(YO_VAULTS[0].address)}
+            onDepositSuccess={(refetch) => setRefetchDashboard(() => refetch)}
           />
-        )}
-
-        <EarnModal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          vaultAddress={selectedVault}
-          onSuccess={handleModalSuccess}
+        </div>
+      ) : (
+        <LandingPage
+          isConnected={isConnected}
+          onOpenModal={openModal}
+          apyMap={apyMap}
         />
+      )}
 
-        <AIAdvisor />
+      <EarnModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        vaultAddress={selectedVault}
+        onSuccess={handleModalSuccess}
+      />
+
+      <AIAdvisor />
     </div>
   )
 }

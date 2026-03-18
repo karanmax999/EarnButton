@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 100" width="320" height="100">
+  <defs>
+    <linearGradient id="pill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c8f56a"/>
+      <stop offset="50%" stop-color="#7ee84a"/>
+      <stop offset="100%" stop-color="#a8f060"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="rgba(0,0,0,0.25)"/>
+    </filter>
+  </defs>
+  <!-- Pill background -->
+  <rect x="4" y="4" width="312" height="92" rx="46" ry="46" fill="url(#pill)" filter="url(#shadow)"/>
+  <!-- eB monogram -->
+  <text x="52" y="68" font-family="Georgia, serif" font-size="58" font-weight="400" fill="rgba(255,255,255,0.85)" text-anchor="middle" letter-spacing="-2">eB</text>
+  <!-- Divider -->
+  <line x1="108" y1="22" x2="108" y2="78" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+  <!-- EARNBUTTON text -->
+  <text x="210" y="60" font-family="system-ui, sans-serif" font-size="22" font-weight="300" fill="rgba(255,255,255,0.9)" text-anchor="middle" letter-spacing="3">EARNBUTTON</text>
+</svg>
