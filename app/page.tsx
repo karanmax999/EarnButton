@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import Link from 'next/link'
 import Image from 'next/image'
 import VaultInfo from '@/components/VaultInfo'
 import Dashboard from '@/components/Dashboard'
@@ -123,7 +124,15 @@ export default function Home() {
               </nav>
             )}
           </div>
-          <ConnectButton />
+          <div className="flex items-center gap-4">
+            <Link
+              href="/demo"
+              className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-white/60 hover:text-teal-400 transition-colors"
+            >
+              For Developers →
+            </Link>
+            <ConnectButton />
+          </div>
         </div>
       </header>
 
