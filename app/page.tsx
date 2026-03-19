@@ -12,6 +12,7 @@ import NetworkGuard from '@/components/NetworkGuard'
 import APYTicker from '@/components/APYTicker'
 import YieldCalculator from '@/components/YieldCalculator'
 import CTASection from '@/components/CTASection'
+import FeatureCarousel from '@/components/ui/feature-carousel'
 import { Marquee } from '@/components/ui/Marquee'
 import AIAdvisor from '@/components/AIAdvisor'
 import { YO_VAULTS } from '@/lib/constants'
@@ -492,46 +493,10 @@ function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="px-4 py-16 sm:py-20">
-        <div className="mx-auto max-w-4xl">
-          <h2 className="mb-12 text-center text-3xl font-black text-neutral-900">How it works</h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {[
-              { n: '1', title: 'Connect wallet', desc: 'Connect your Base wallet in one click. No sign-up required.', dir: 'scroll-fade-left' },
-              { n: '2', title: 'Choose a vault', desc: 'Pick USDC, ETH, BTC, or EUR. See live APY and TVL.', dir: 'scroll-fade-up' },
-              { n: '3', title: 'Start earning', desc: 'Deposit and earn yield automatically. Withdraw anytime.', dir: 'scroll-fade-right' },
-            ].map((step) => (
-              <div key={step.n} className={`${step.dir} rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-sm`}>
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-teal-50 text-xl font-black text-teal-600">
-                  {step.n}
-                </div>
-                <h3 className="mb-2 text-base font-bold text-neutral-900">{step.title}</h3>
-                <p className="text-sm text-neutral-500">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Trust */}
-      <section className="bg-neutral-50 px-4 py-16 sm:py-20">
-        <div className="mx-auto max-w-4xl">
-          <h2 className="mb-10 text-center text-3xl font-black text-neutral-900">Built for trust</h2>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { icon: '🔒', title: 'Non-custodial', desc: 'Your keys, your funds. Always.' },
-              { icon: '🔍', title: 'Transparent', desc: 'All allocations visible on-chain.' },
-              { icon: '✅', title: 'Audited', desc: 'Protocols audited by top firms.' },
-              { icon: '⚡', title: 'Instant exit', desc: 'Withdraw anytime, no lock-up.' },
-            ].map((card) => (
-              <div key={card.title} className="trust-card rounded-2xl border border-neutral-200 bg-white p-5">
-                <div className="trust-icon mb-3 text-2xl text-neutral-400">{card.icon}</div>
-                <h3 className="mb-1 text-sm font-bold text-neutral-900">{card.title}</h3>
-                <p className="text-xs text-neutral-500">{card.desc}</p>
-              </div>
-            ))}
-          </div>
+      {/* Feature Carousel — replaces How It Works + Built for Trust */}
+      <section className="py-16 bg-white">
+        <div className="mx-auto max-w-6xl">
+          <FeatureCarousel />
         </div>
       </section>
 
