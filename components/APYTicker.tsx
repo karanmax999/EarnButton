@@ -14,16 +14,19 @@ export default function APYTicker() {
 
   return (
     <div
-      className="hidden lg:flex items-center overflow-hidden max-w-xs"
+      className="hidden lg:block overflow-hidden w-48 shrink-0"
       aria-label="Live vault APY rates"
       aria-live="polite"
     >
-      <div className="flex items-center gap-6 animate-ticker whitespace-nowrap">
-        {doubled.map((label, i) => (
-          <span key={i} className="text-xs font-medium text-white/40 shrink-0">
-            <span className="text-teal-400/70">●</span>{' '}{label}
-          </span>
-        ))}
+      {/* outer wrapper is overflow:hidden; inner strip scrolls left */}
+      <div className="relative w-full overflow-hidden">
+        <div className="animate-ticker flex items-center gap-6 whitespace-nowrap w-max">
+          {doubled.map((label, i) => (
+            <span key={i} className="text-xs font-medium text-white/40 shrink-0">
+              <span className="text-teal-400/70">●</span>{' '}{label}
+            </span>
+          ))}
+        </div>
       </div>
       <style>{`
         @keyframes ticker {
@@ -31,7 +34,8 @@ export default function APYTicker() {
           100% { transform: translateX(-50%); }
         }
         .animate-ticker {
-          animation: ticker 18s linear infinite;
+          animation: ticker 20s linear infinite;
+          will-change: transform;
         }
         .animate-ticker:hover {
           animation-play-state: paused;

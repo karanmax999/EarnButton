@@ -164,11 +164,9 @@ export default function Home() {
                 <Image src="/logo.svg" alt="EarnButton" width={140} height={32} priority />
               </button>
 
-              <APYTicker />
-
-            {/* Desktop nav links */}
+              {/* Desktop nav links */}
               {isConnected && (
-                <nav className="hidden sm:flex items-center gap-4">
+                <nav className="hidden sm:flex items-center gap-6">
                   <button
                     type="button"
                     onClick={() => setCurrentView('home')}
@@ -185,6 +183,11 @@ export default function Home() {
                   </button>
                 </nav>
               )}
+            </div>
+
+            {/* APY Ticker — centered, desktop only */}
+            <div className="hidden lg:flex flex-1 justify-center px-4">
+              <APYTicker />
             </div>
 
             {/* Right side */}
