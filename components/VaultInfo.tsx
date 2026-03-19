@@ -13,7 +13,6 @@ export interface VaultInfoProps {
   onDeposit?: () => void
 }
 
-// Per-vault accent colors for the top border
 const VAULT_ACCENT: Record<string, string> = {
   yousd: '#00c896',
   yoeth: '#627EEA',
@@ -36,7 +35,7 @@ const VaultInfo: React.FC<VaultInfoProps> = ({ vaultAddress, connectMode = false
   if (isLoading) {
     return (
       <div className="vault-card rounded-2xl border border-neutral-200 bg-white shadow-soft overflow-hidden flex flex-col min-h-[220px]">
-        <div className="h-[3px] w-full" style={{ background: accent }} />
+        <div className="vault-accent-bar h-[3px] w-full" style={{ background: accent }} />
         <div className="p-5 space-y-4 flex-1 flex flex-col">
           <div className="flex items-start justify-between gap-2">
             <div>
@@ -71,7 +70,7 @@ const VaultInfo: React.FC<VaultInfoProps> = ({ vaultAddress, connectMode = false
 
   return (
     <div className="vault-card rounded-2xl border border-neutral-200 bg-white shadow-soft overflow-hidden flex flex-col min-h-[220px]">
-      <div className="h-[3px] w-full" style={{ background: accent }} />
+      <div className="vault-accent-bar h-[3px] w-full" style={{ background: accent }} />
       <div className="p-5 space-y-4 flex-1 flex flex-col">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
@@ -86,7 +85,7 @@ const VaultInfo: React.FC<VaultInfoProps> = ({ vaultAddress, connectMode = false
         <div className="grid grid-cols-3 gap-3">
           <div className="space-y-0.5">
             <p className="text-xs text-neutral-400 uppercase tracking-wide">APY</p>
-            <p className="text-2xl font-bold text-primary-600">{formatAPY(apy)}</p>
+            <p className="apy-value text-2xl font-bold text-primary-600">{formatAPY(apy)}</p>
           </div>
           <div className="space-y-0.5">
             <p className="text-xs text-neutral-400 uppercase tracking-wide">TVL</p>

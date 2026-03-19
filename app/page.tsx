@@ -151,7 +151,7 @@ export default function Home() {
   return (
     <NetworkGuard>
       <div className="min-h-screen bg-white">
-        <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0a0f1e]/90 backdrop-blur-md">
+        <header className="navbar-glass sticky top-0 z-40">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 relative">
             {/* Logo */}
             <div className="flex items-center gap-4">
@@ -257,6 +257,32 @@ export default function Home() {
   )
 }
 
+// ─── VaultCardWrapper — scroll-triggered entrance ────────────────────────────
+
+function VaultCardWrapper({ children, dir }: { children: React.ReactNode; dir: 'from-left' | 'from-bottom' | 'from-right' }) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('visible')
+          obs.disconnect()
+        }
+      },
+      { threshold: 0.1 },
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+  return (
+    <div ref={ref} className={`vault-card-enter ${dir} h-full`}>
+      {children}
+    </div>
+  )
+}
+
 // ─── LandingPage ──────────────────────────────────────────────────────────────
 
 interface LandingPageProps {
@@ -268,6 +294,13 @@ interface LandingPageProps {
 function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
   useScrollReveal()
   const { value: tvlValue, ref: tvlRef } = useTVLCountUp(44)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 100)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   const marqueeRow1 = [
     'How do I earn yield on USDC?',
@@ -293,42 +326,67 @@ function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
         className="relative overflow-hidden bg-[#0a0f1e] px-4 py-20 sm:py-28 text-center"
         style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)', backgroundSize: '28px 28px' }}
       >
+        {/* Floating orbs */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="hero-orb-1 absolute -top-16 -left-16 h-64 w-64 rounded-full bg-teal-500/10 blur-3xl" />
+          <div className="hero-orb-2 absolute top-1/3 -right-20 h-80 w-80 rounded-full bg-teal-400/8 blur-3xl" />
+          <div className="hero-orb-3 absolute -bottom-10 left-1/3 h-56 w-56 rounded-full bg-teal-600/10 blur-3xl" />
+          <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-gradient-to-r from-transparent via-teal-500/20 to-transparent" />
+        </div>
+
         <div className="relative mx-auto max-w-3xl">
-          <h1 className="animate-fade-up text-4xl sm:text-6xl font-black text-white leading-tight" style={{ animationDelay: '0ms' }}>
-            The smartest savings<br />
-            <span className="text-teal-400">account in DeFi.</span>
+          <h1 className="text-4xl sm:text-6xl font-black text-white leading-tight">
+            {['The', 'smartest', 'savings', 'account', 'in', 'DeFi.'].map((word, i) => (
+              <span
+                key={word + i}
+                className={`word-animate${i >= 4 ? ' text-teal-400' : ''}`}
+                style={{ animationDelay: `${i * 80}ms`, marginRight: i === 2 ? '0' : '0.25em' }}
+              >
+                {word}{i === 2 ? <br /> : null}
+              </span>
+            ))}
           </h1>
           <p className="animate-fade-up mt-5 text-lg text-white/60 max-w-xl mx-auto" style={{ animationDelay: '150ms' }}>
             Earn 5-9% APY on USDC, ETH, BTC, and EUR. One tap. No complexity. Powered by YO Protocol on Base.
           </p>
           <div className="animate-fade-up mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-white/50" style={{ animationDelay: '300ms' }}>
-            <span className="flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+            <span className="stat-item flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
               Live on Base Mainnet
             </span>
-            <span>·</span>
-            <span>$<span ref={tvlRef}>{tvlValue}</span>M+ TVL</span>
-            <span>·</span>
-            <span>Non-custodial</span>
-            <span>·</span>
-            <span>Audited</span>
+            <span>|</span>
+            <span className="stat-item">$<span ref={tvlRef}>{tvlValue}</span>M+ TVL</span>
+            <span>|</span>
+            <span className="stat-item">Non-custodial</span>
+            <span>|</span>
+            <span className="stat-item">Audited</span>
           </div>
           <div className="animate-fade-up mt-8 flex flex-wrap items-center justify-center gap-3" style={{ animationDelay: '450ms' }}>
             {isConnected ? (
               <button
                 type="button"
                 onClick={() => onOpenModal(YO_VAULTS[0].address)}
-                className="rounded-xl bg-teal-500 px-7 py-3.5 text-sm font-bold text-white hover:bg-teal-400 transition-colors shadow-lg"
+                className="btn-earn rounded-xl bg-teal-500 px-7 py-3.5 text-sm font-bold text-white hover:bg-teal-400 transition-colors shadow-lg"
               >
                 Earn with YO
               </button>
             ) : (
               <ConnectButton label="Earn with YO" />
             )}
-            <a href="#vaults" className="rounded-xl border border-white/20 px-7 py-3.5 text-sm font-semibold text-white/80 hover:border-white/40 hover:text-white transition-colors">
+            <a href="#vaults" className="btn-vaults rounded-xl border border-white/20 px-7 py-3.5 text-sm font-semibold text-white/80">
               View Vaults
             </a>
           </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div
+          aria-hidden="true"
+          className={`scroll-indicator${scrolled ? ' hidden-indicator' : ''} absolute bottom-6 left-1/2 -translate-x-1/2`}
+        >
+          <svg className="h-6 w-6 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
         </div>
       </section>
 
@@ -346,21 +404,19 @@ function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
             <h2 className="text-3xl font-black text-neutral-900">Choose your vault</h2>
             <p className="mt-2 text-neutral-500">Four assets. Real yield. All on Base.</p>
           </div>
-          {/* h-full on wrapper + items-stretch ensures equal card heights */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 items-stretch">
-            {YO_VAULTS.map((vault, i) => (
-              <div
-                key={vault.address}
-                className="animate-fade-up h-full"
-                style={{ animationDelay: `${500 + i * 100}ms` }}
-              >
-                <VaultInfo
-                  vaultAddress={vault.address}
-                  connectMode={!isConnected}
-                  onDeposit={isConnected ? () => onOpenModal(vault.address) : undefined}
-                />
-              </div>
-            ))}
+            {YO_VAULTS.map((vault, i) => {
+              const dirs = ['from-left', 'from-bottom', 'from-bottom', 'from-right'] as const
+              return (
+                <VaultCardWrapper key={vault.address} dir={dirs[i] ?? 'from-bottom'}>
+                  <VaultInfo
+                    vaultAddress={vault.address}
+                    connectMode={!isConnected}
+                    onDeposit={isConnected ? () => onOpenModal(vault.address) : undefined}
+                  />
+                </VaultCardWrapper>
+              )
+            })}
           </div>
         </div>
       </section>
