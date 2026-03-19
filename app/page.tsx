@@ -512,6 +512,34 @@ function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
         </div>
       </section>
 
+      {/* Community banner */}
+      <section className="bg-neutral-900 px-4 py-10 text-center">
+        <div className="mx-auto max-w-xl space-y-4">
+          <p className="text-sm font-semibold text-white/70 uppercase tracking-widest">Support EarnButton</p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="https://x.com/earnbutton"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+              Follow @earnbutton
+            </a>
+            <a
+              href="https://dorahacks.io/buidl/40852"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-400 transition-colors"
+            >
+              🚀 Upvote on DoraHacks
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-[#0a0f1e] px-4 py-10 text-center text-xs text-white/30">
         <div className="mx-auto max-w-4xl space-y-3">
@@ -531,6 +559,14 @@ function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
               className="hover:text-white transition-colors"
             >
               yoUSD on Basescan ↗
+            </a>
+            <span>·</span>
+            <a href="https://x.com/earnbutton" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+              Twitter / X
+            </a>
+            <span>·</span>
+            <a href="https://dorahacks.io/buidl/40852" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+              DoraHacks ↗
             </a>
             <span>·</span>
             <Link href="/demo" className="hover:text-white transition-colors">
