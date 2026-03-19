@@ -152,7 +152,7 @@ export default function Home() {
 
   return (
     <NetworkGuard>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen" style={{ background: '#080d14' }}>
         <header className="navbar-glass sticky top-0 z-40">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 relative">
             {/* Logo */}

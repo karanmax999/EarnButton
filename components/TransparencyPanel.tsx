@@ -12,14 +12,15 @@ const TransparencyPanel: React.FC<TransparencyPanelProps> = ({ vaultAddress }) =
 
   if (isLoading) {
     return (
-      <div className="rounded-2xl bg-neutral-100 p-5 animate-pulse space-y-4">
+      <div className="rounded-2xl p-5 animate-pulse space-y-4"
+        style={{ background: '#111827', border: '1px solid rgba(255,255,255,0.06)' }}>
         {[1, 2, 3].map((i) => (
           <div key={i} className="space-y-2">
             <div className="flex justify-between">
-              <div className="h-4 bg-neutral-200 rounded w-1/3" />
-              <div className="h-4 bg-neutral-200 rounded w-16" />
+              <div className="h-4 rounded w-1/3" style={{ background: 'rgba(255,255,255,0.06)' }} />
+              <div className="h-4 rounded w-16" style={{ background: 'rgba(255,255,255,0.06)' }} />
             </div>
-            <div className="h-2 bg-neutral-200 rounded-full w-full" />
+            <div className="h-2 rounded-full w-full" style={{ background: 'rgba(255,255,255,0.06)' }} />
           </div>
         ))}
       </div>
@@ -27,10 +28,11 @@ const TransparencyPanel: React.FC<TransparencyPanelProps> = ({ vaultAddress }) =
   }
 
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-5 space-y-4 shadow-soft">
+    <div className="rounded-2xl p-5 space-y-4"
+      style={{ background: '#111827', border: '1px solid rgba(255,255,255,0.06)' }}>
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-neutral-800">Fund Allocation</h3>
-        <span className="text-xs text-neutral-400 italic">Indicative — rebalances automatically</span>
+        <h3 className="text-sm font-semibold text-white">Fund Allocation</h3>
+        <span className="text-xs text-gray-600 italic">Indicative — rebalances automatically</span>
       </div>
       <div className="space-y-3">
         {allocations.map((entry) => (
@@ -46,35 +48,28 @@ function AllocationRow({ entry }: {
 }) {
   const { pool, protocol, percentage, yield1d } = entry
   const barColor =
-    protocol === 'Aave' ? 'bg-blue-500' :
-    protocol === 'Morpho' ? 'bg-purple-500' :
-    protocol === 'Auto' ? 'bg-orange-500' :
-    protocol === 'Resolv' ? 'bg-teal-500' :
-    protocol === 'Aura' ? 'bg-indigo-500' :
-    protocol === 'Fluid' ? 'bg-cyan-500' :
-    'bg-primary-500'
+    protocol === 'Aave' ? '#3b82f6' :
+    protocol === 'Morpho' ? '#a855f7' :
+    protocol === 'Auto' ? '#f97316' :
+    protocol === 'Resolv' ? '#00c896' :
+    protocol === 'Aura' ? '#6366f1' :
+    protocol === 'Fluid' ? '#06b6d4' :
+    '#00c896'
 
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-sm font-medium text-neutral-800 truncate min-w-0">{pool}</span>
+        <span className="text-sm font-medium text-gray-300 truncate min-w-0">{pool}</span>
         <div className="flex items-center gap-3 shrink-0">
-          {yield1d > 0 && (
-            <span className="text-xs text-green-600 font-medium">{yield1d.toFixed(2)}%</span>
-          )}
-          <span className="text-sm font-semibold text-neutral-700">{percentage.toFixed(1)}%</span>
+          {yield1d > 0 && <span className="text-xs text-teal-400 font-medium">{yield1d.toFixed(2)}%</span>}
+          <span className="text-sm font-semibold text-white">{percentage.toFixed(1)}%</span>
         </div>
       </div>
-      <div className="w-full bg-neutral-100 rounded-full h-1.5 overflow-hidden">
-        <div
-          className={`h-1.5 rounded-full transition-all duration-500 ${barColor}`}
-          style={{ width: `${Math.min(percentage, 100)}%` }}
-          role="progressbar"
-          aria-valuenow={percentage}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={`${pool}: ${percentage.toFixed(1)}%`}
-        />
+      <div className="w-full rounded-full h-1.5 overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+        <div className="h-1.5 rounded-full transition-all duration-500"
+          style={{ width: `${Math.min(percentage, 100)}%`, background: barColor }}
+          role="progressbar" aria-valuenow={percentage} aria-valuemin={0} aria-valuemax={100}
+          aria-label={`${pool}: ${percentage.toFixed(1)}%`} />
       </div>
     </div>
   )
