@@ -296,7 +296,6 @@ interface LandingPageProps {
 
 function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
   useScrollReveal()
-  const { value: tvlValue, ref: tvlRef } = useTVLCountUp(44)
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -326,59 +325,103 @@ function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
     <main>
       {/* Hero */}
       <section
-        className="relative overflow-hidden bg-[#0a0f1e] px-4 py-20 sm:py-28 text-center"
-        style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)', backgroundSize: '28px 28px' }}
+        className="relative overflow-hidden bg-[#0a0f1e] min-h-screen flex items-center"
+        style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)', backgroundSize: '28px 28px', paddingTop: '64px' }}
       >
-        {/* Floating orbs */}
+        {/* Background glow — left side */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="hero-orb-1 absolute -top-16 -left-16 h-64 w-64 rounded-full bg-teal-500/10 blur-3xl" />
-          <div className="hero-orb-2 absolute top-1/3 -right-20 h-80 w-80 rounded-full bg-teal-400/8 blur-3xl" />
-          <div className="hero-orb-3 absolute -bottom-10 left-1/3 h-56 w-56 rounded-full bg-teal-600/10 blur-3xl" />
-          <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-gradient-to-r from-transparent via-teal-500/20 to-transparent" />
+          <div className="hero-orb-1 absolute top-1/4 -left-32 h-[500px] w-[500px] rounded-full bg-teal-500/10 blur-3xl" />
+          <div className="hero-orb-2 absolute bottom-1/4 -left-16 h-64 w-64 rounded-full bg-teal-400/8 blur-3xl" />
         </div>
 
-        <div className="relative mx-auto max-w-3xl">
-          <h1 className="text-4xl sm:text-6xl font-black text-white leading-tight">
-            {['The', 'smartest', 'savings', 'account', 'in', 'DeFi.'].map((word, i) => (
-              <span
-                key={word + i}
-                className={`word-animate${i >= 4 ? ' text-teal-400' : ''}`}
-                style={{ animationDelay: `${i * 80}ms`, marginRight: i === 2 ? '0' : '0.25em' }}
-              >
-                {word}{i === 2 ? <br /> : null}
-              </span>
-            ))}
-          </h1>
-          <p className="animate-fade-up mt-5 text-lg text-white/60 max-w-xl mx-auto" style={{ animationDelay: '150ms' }}>
-            Earn 5-9% APY on USDC, ETH, BTC, and EUR. One tap. No complexity. Powered by YO Protocol on Base.
-          </p>
-          <div className="animate-fade-up mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-white/50" style={{ animationDelay: '300ms' }}>
-            <span className="stat-item flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-              Live on Base Mainnet
-            </span>
-            <span>|</span>
-            <span className="stat-item">$<span ref={tvlRef}>{tvlValue}</span>M+ TVL</span>
-            <span>|</span>
-            <span className="stat-item">Non-custodial</span>
-            <span>|</span>
-            <span className="stat-item">Audited</span>
-          </div>
-          <div className="animate-fade-up mt-8 flex flex-wrap items-center justify-center gap-3" style={{ animationDelay: '450ms' }}>
-            {isConnected ? (
-              <button
-                type="button"
-                onClick={() => onOpenModal(YO_VAULTS[0].address)}
-                className="btn-earn rounded-xl bg-teal-500 px-7 py-3.5 text-sm font-bold text-white hover:bg-teal-400 transition-colors shadow-lg"
-              >
-                Earn with YO
-              </button>
-            ) : (
-              <ConnectButton label="Earn with YO" />
-            )}
-            <a href="#vaults" className="btn-vaults rounded-xl border border-white/20 px-7 py-3.5 text-sm font-semibold text-white/80">
-              View Vaults
-            </a>
+        <div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 py-16 sm:py-20">
+          {/* Split layout */}
+          <div className="flex flex-col-reverse md:flex-row md:items-center md:gap-12">
+
+            {/* LEFT — text */}
+            <div className="flex-[55] mt-10 md:mt-0">
+              {/* Eyebrow */}
+              <div className="animate-fade-up mb-5 flex items-center gap-2" style={{ animationDelay: '0ms' }}>
+                <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse shrink-0" />
+                <span className="font-mono text-xs tracking-[0.2em] text-teal-400 uppercase">
+                  Powered by YO Protocol · Live on Base
+                </span>
+              </div>
+
+              {/* Headline */}
+              <h1 className="animate-fade-up text-4xl sm:text-5xl font-black text-white leading-tight" style={{ animationDelay: '80ms' }}>
+                The smartest savings<br />
+                account{' '}
+                <span className="text-teal-400">in DeFi.</span>
+              </h1>
+
+              {/* Subheadline */}
+              <p className="animate-fade-up mt-5 text-base text-gray-300 max-w-md" style={{ animationDelay: '180ms' }}>
+                Earn 5–9% APY on USDC, ETH, BTC, and EUR. One tap. No complexity. Powered by YO Protocol on Base.
+              </p>
+
+              {/* Stats 2×2 */}
+              <div className="animate-fade-up mt-8 grid grid-cols-2 gap-4 max-w-sm" style={{ animationDelay: '280ms' }}>
+                {[
+                  { value: '$44M+', label: 'Total TVL' },
+                  { value: '5.29%', label: 'Top APY' },
+                  { value: '4', label: 'Vaults' },
+                  { value: '0%', label: 'Lock-up' },
+                ].map((s) => (
+                  <div key={s.label} className="border-l-2 border-teal-500 pl-3">
+                    <p className="text-lg font-bold text-white leading-none">{s.value}</p>
+                    <p className="mt-0.5 text-xs text-white/40">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Buttons */}
+              <div className="animate-fade-up mt-8 flex flex-col sm:flex-row gap-3" style={{ animationDelay: '380ms' }}>
+                {isConnected ? (
+                  <button
+                    type="button"
+                    onClick={() => onOpenModal(YO_VAULTS[0].address)}
+                    className="btn-earn w-full sm:w-auto rounded-xl bg-teal-500 px-8 py-4 text-base font-semibold text-white hover:bg-teal-400 transition-colors shadow-lg flex items-center justify-center gap-2"
+                  >
+                    Earn with YO <span aria-hidden="true">→</span>
+                  </button>
+                ) : (
+                  <ConnectButton label="Earn with YO →" />
+                )}
+                <a
+                  href="#vaults"
+                  className="btn-vaults w-full sm:w-auto rounded-xl border border-white/20 px-8 py-4 text-base font-semibold text-white/80 hover:border-white/60 hover:text-white transition-colors flex items-center justify-center gap-2"
+                >
+                  View Vaults
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            {/* RIGHT — image */}
+            <div className="flex-[45] flex justify-center md:justify-end">
+              <div className="relative w-full max-w-[480px] md:max-w-none">
+                <div className="relative rounded-2xl overflow-hidden max-h-64 md:max-h-none">
+                  <Image
+                    src="/One_Tap_to_Higher_Yields_version1.png"
+                    alt="EarnButton — DeFi yield made simple"
+                    width={600}
+                    height={500}
+                    priority
+                    className="w-full h-auto object-cover rounded-2xl"
+                  />
+                  {/* Left-edge fade blending into dark bg */}
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-y-0 left-0 w-[120px]"
+                    style={{ background: 'linear-gradient(to right, #0a0f1e, transparent)' }}
+                  />
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
