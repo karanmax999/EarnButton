@@ -439,18 +439,18 @@ function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
       </section>
 
       {/* Yield Calculator */}
-      <section className="bg-neutral-50 px-4 py-16 sm:py-20">
+      <section className="px-4 py-16 sm:py-20" style={{ background: '#080d14' }}>
         <div className="mx-auto max-w-lg">
           <YieldCalculator apyMap={apyMap} />
         </div>
       </section>
 
       {/* Vaults */}
-      <section id="vaults" className="px-4 py-16 sm:py-20">
+      <section id="vaults" className="px-4 py-16 sm:py-20" style={{ background: '#0d1421' }}>
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 text-center">
-            <h2 className="text-3xl font-black text-neutral-900">Choose your vault</h2>
-            <p className="mt-2 text-neutral-500">Four assets. Real yield. All on Base.</p>
+            <h2 className="text-4xl font-black text-white">Choose your vault</h2>
+            <p className="mt-2 text-gray-400">Four assets. Real yield. All on Base.</p>
           </div>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 items-stretch">
             {YO_VAULTS.map((vault, i) => {
@@ -470,12 +470,12 @@ function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
       </section>
 
       {/* Marquee */}
-      <section className="bg-neutral-50 py-10 overflow-hidden">
+      <section className="py-10 overflow-hidden" style={{ background: '#080d14' }}>
         <div className="space-y-3">
           <div className="marquee-row">
             <Marquee duration="35s" gap="2rem">
               {marqueeRow1.map((q) => (
-                <span key={q} className="shrink-0 rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm text-neutral-600 shadow-sm">
+                <span key={q} className="shrink-0 rounded-full px-4 py-2 text-sm text-gray-400 transition-colors hover:text-teal-400" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
                   {q}
                 </span>
               ))}
@@ -484,7 +484,7 @@ function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
           <div className="marquee-row">
             <Marquee duration="45s" gap="2rem" reverse>
               {marqueeRow2.map((q) => (
-                <span key={q} className="shrink-0 rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm text-neutral-600 shadow-sm">
+                <span key={q} className="shrink-0 rounded-full px-4 py-2 text-sm text-gray-400 transition-colors hover:text-teal-400" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
                   {q}
                 </span>
               ))}
@@ -494,7 +494,7 @@ function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
       </section>
 
       {/* Feature Carousel — replaces How It Works + Built for Trust */}
-      <section className="py-16 bg-white">
+      <section className="py-16" style={{ background: '#080d14' }}>
         <div className="mx-auto max-w-6xl">
           <FeatureCarousel />
         </div>
