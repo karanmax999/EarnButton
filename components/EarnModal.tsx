@@ -9,7 +9,7 @@ import { sanitizeInput } from '@/lib/security'
 import { BLOCK_EXPLORER, YO_VAULTS, CONTRACTS } from '@/lib/constants'
 import { useYOVaults } from '@/lib/hooks/useYOVaults'
 import { useToast } from '@/components/Toast'
-import { recordDeposit } from '@/lib/depositStore'
+import { recordDeposit, addActivityRecord } from '@/lib/depositStore'
 import { useAccount } from 'wagmi'
 
 export interface EarnModalProps {
@@ -371,7 +371,20 @@ const EarnModal: React.FC<EarnModalProps> = ({ isOpen, onClose, vaultAddress, on
     if (!isDepositing && depositTxHash) {
       setFinalTxHash(depositTxHash)
       // Persist deposited amount so Dashboard can calculate yield
-      if (walletAddress) recordDeposit(walletAddress, vaultAddress, parsedAmount)
+      if (walletAddress) {
+        recordDeposit(walletAddress, vaultAddress, parsedAmount)
+        const vaultCfg = YO_VAULTS.find((v) => v.address.toLowerCase() === vaultAddress.toLowerCase())
+        const humanAmount = (Number(parsedAmount) / 10 ** (vaultCfg?.decimals ?? 6)).toFixed(2)
+        addActivityRecord(walletAddress, {
+          type: 'deposit',
+          vaultName: vaultCfg?.name ?? 'Vault',
+          vaultAddress,
+          amount: humanAmount,
+          txHash: depositTxHash,
+          basescanUrl: `${BLOCK_EXPLORER.BASE}/tx/${depositTxHash}`,
+          timestamp: Date.now(),
+        })
+      }
       setStep('success')
       addToast('success', `Deposit confirmed · ${formatTxHash(depositTxHash)}`)
       onSuccess?.()

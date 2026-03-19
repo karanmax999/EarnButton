@@ -9,6 +9,7 @@ import VaultInfo from '@/components/VaultInfo'
 import Dashboard from '@/components/Dashboard'
 import EarnModal from '@/components/EarnModal'
 import NetworkGuard from '@/components/NetworkGuard'
+import APYTicker from '@/components/APYTicker'
 import YieldCalculator from '@/components/YieldCalculator'
 import { Marquee } from '@/components/ui/Marquee'
 import AIAdvisor from '@/components/AIAdvisor'
@@ -163,7 +164,9 @@ export default function Home() {
                 <Image src="/logo.svg" alt="EarnButton" width={140} height={32} priority />
               </button>
 
-              {/* Desktop nav links */}
+              <APYTicker />
+
+            {/* Desktop nav links */}
               {isConnected && (
                 <nav className="hidden sm:flex items-center gap-4">
                   <button

@@ -35,7 +35,8 @@ import {
 } from '@/lib/portfolio'
 import { formatUSDC, formatAPY, formatTxHash } from '@/lib/formatting'
 import { BLOCK_EXPLORER, REFRESH_INTERVALS, YO_VAULTS } from '@/lib/constants'
-import { getRecordedDeposit } from '@/lib/depositStore'
+import { getRecordedDeposit, addActivityRecord } from '@/lib/depositStore'
+import RecentActivity from '@/components/RecentActivity'
 import { useToast } from '@/components/Toast'
 import { Skeleton } from '@/components/ui/Skeleton'
 import type { VaultPosition } from '@/types'
@@ -501,6 +502,49 @@ function VaultSharePriceLoader({ vaultAddress, onResult }: VaultSharePriceLoader
   return null
 }
 
+// ─── ShareButton ──────────────────────────────────────────────────────────────
+
+function ShareButton({ weightedAPY }: { weightedAPY: number }) {
+  const [copied, setCopied] = useState(false)
+  const { addToast } = useToast()
+
+  const handleShare = () => {
+    const apy = weightedAPY > 0 ? weightedAPY.toFixed(2) : '5+'
+    const text = `I'm earning ${apy}% APY on my USDC with EarnButton 🟢\nTry it: https://earnbutton.xyz\nPowered by @yo_protocol on @base`
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true)
+      addToast('success', 'Share text copied to clipboard!')
+      setTimeout(() => setCopied(false), 2000)
+    }).catch(() => {
+      addToast('error', 'Could not copy to clipboard')
+    })
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleShare}
+      className="flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-medium text-neutral-600 hover:border-teal-300 hover:text-teal-600 transition-colors shadow-sm"
+    >
+      {copied ? (
+        <>
+          <svg className="h-3 w-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+          </svg>
+          Copied!
+        </>
+      ) : (
+        <>
+          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          </svg>
+          Share EarnButton
+        </>
+      )}
+    </button>
+  )
+}
+
 // ─── Dashboard (main) ─────────────────────────────────────────────────────────
 
 function DashboardInner({ userAddress, onDeposit, onDepositSuccess }: DashboardProps) {
@@ -638,6 +682,8 @@ function DashboardInner({ userAddress, onDeposit, onDepositSuccess }: DashboardP
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-neutral-800">Your Positions</h2>
           <div className="flex items-center gap-3">
+            {/* Share button */}
+            <ShareButton weightedAPY={weightedAPY} />
             <span className="flex items-center gap-1.5 text-xs text-green-600 font-medium">
               <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
               Live on Base Mainnet
@@ -654,6 +700,11 @@ function DashboardInner({ userAddress, onDeposit, onDepositSuccess }: DashboardP
           onDeposit={onDeposit}
         />
       </div>
+
+      {/* ── Recent Activity ── */}
+      {walletAddress && (
+        <RecentActivity walletAddress={walletAddress} />
+      )}
     </div>
   )
 }
