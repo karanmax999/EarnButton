@@ -113,13 +113,13 @@ export default function FeatureCarousel() {
     <div className="w-full">
       {/* Section heading */}
       <div className="text-center mb-10 px-4">
-        <p className="text-teal-500 text-xs font-mono tracking-widest mb-2 uppercase">
+        <p className="text-teal-400 text-xs font-mono tracking-widest mb-2 uppercase">
           Why EarnButton
         </p>
-        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+        <h2 className="text-3xl sm:text-4xl font-bold text-white">
           Everything you need to earn yield
         </h2>
-        <p className="text-gray-500 mt-2 max-w-xl mx-auto text-sm">
+        <p className="text-gray-400 mt-2 max-w-xl mx-auto text-sm">
           Nine reasons thousands choose EarnButton over building their own DeFi strategy.
         </p>
       </div>

@@ -475,7 +475,7 @@ function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
           <div className="marquee-row">
             <Marquee duration="35s" gap="2rem">
               {marqueeRow1.map((q) => (
-                <span key={q} className="shrink-0 rounded-full px-4 py-2 text-sm text-gray-400 transition-colors hover:text-teal-400" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <span key={q} className="shrink-0 rounded-full px-4 py-2 text-sm text-gray-300 transition-colors hover:text-teal-400 hover:border-teal-500/30" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
                   {q}
                 </span>
               ))}
@@ -484,7 +484,7 @@ function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
           <div className="marquee-row">
             <Marquee duration="45s" gap="2rem" reverse>
               {marqueeRow2.map((q) => (
-                <span key={q} className="shrink-0 rounded-full px-4 py-2 text-sm text-gray-400 transition-colors hover:text-teal-400" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <span key={q} className="shrink-0 rounded-full px-4 py-2 text-sm text-gray-300 transition-colors hover:text-teal-400 hover:border-teal-500/30" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
                   {q}
                 </span>
               ))}
