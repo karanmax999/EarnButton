@@ -8,6 +8,7 @@ import Image from 'next/image'
 import VaultInfo from '@/components/VaultInfo'
 import Dashboard from '@/components/Dashboard'
 import EarnModal from '@/components/EarnModal'
+import NetworkGuard from '@/components/NetworkGuard'
 import YieldCalculator from '@/components/YieldCalculator'
 import { Marquee } from '@/components/ui/Marquee'
 import AIAdvisor from '@/components/AIAdvisor'
@@ -65,12 +66,59 @@ function useTVLCountUp(target: number, duration = 2000) {
   return { value, ref }
 }
 
+// ─── Hamburger menu ───────────────────────────────────────────────────────────
+
+function MobileMenu({
+  isConnected,
+  currentView,
+  setCurrentView,
+  onClose,
+}: {
+  isConnected: boolean
+  currentView: CurrentView
+  setCurrentView: (v: CurrentView) => void
+  onClose: () => void
+}) {
+  return (
+    <div className="absolute top-full left-0 right-0 z-50 bg-[#0a0f1e] border-b border-white/10 shadow-lg sm:hidden">
+      <nav className="flex flex-col px-4 py-3 gap-1">
+        {isConnected && (
+          <>
+            <button
+              type="button"
+              onClick={() => { setCurrentView('home'); onClose() }}
+              className={`text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${currentView === 'home' ? 'bg-teal-500/10 text-teal-400' : 'text-white/70 hover:text-white hover:bg-white/5'}`}
+            >
+              Home
+            </button>
+            <button
+              type="button"
+              onClick={() => { setCurrentView('dashboard'); onClose() }}
+              className={`text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${currentView === 'dashboard' ? 'bg-teal-500/10 text-teal-400' : 'text-white/70 hover:text-white hover:bg-white/5'}`}
+            >
+              Dashboard
+            </button>
+          </>
+        )}
+        <Link
+          href="/demo"
+          onClick={onClose}
+          className="px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:text-teal-400 hover:bg-white/5 transition-colors"
+        >
+          For Developers →
+        </Link>
+      </nav>
+    </div>
+  )
+}
+
 export default function Home() {
   const { isConnected, address } = useAccount()
   const [currentView, setCurrentView] = useState<CurrentView>('home')
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedVault, setSelectedVault] = useState(YO_VAULTS[0].address)
   const [refetchDashboard, setRefetchDashboard] = useState<(() => void) | null>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { vaults } = useYOVaults()
 
   const apyMap: Record<string, number> = {}
@@ -80,6 +128,13 @@ export default function Home() {
     if (isConnected) setCurrentView('dashboard')
     else setCurrentView('home')
   }, [isConnected])
+
+  // Close mobile menu on resize to desktop
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth >= 640) setMobileMenuOpen(false) }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   const openModal = useCallback((vaultAddress: string) => {
     setSelectedVault(vaultAddress as `0x${string}`)
@@ -93,74 +148,109 @@ export default function Home() {
   }, [isConnected, refetchDashboard])
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0a0f1e]/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-6">
-            <button
-              type="button"
-              onClick={() => setCurrentView('home')}
-              className="flex items-center hover:opacity-80 transition-opacity"
-              aria-label="EarnButton home"
-            >
-              <Image src="/logo.svg" alt="EarnButton" width={160} height={36} priority />
-            </button>
-            {isConnected && (
-              <nav className="hidden sm:flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => setCurrentView('home')}
-                  className={`text-sm font-medium transition-colors pb-0.5 border-b-2 ${currentView === 'home' ? 'text-teal-400 border-teal-400' : 'text-white/60 border-transparent hover:text-white'}`}
-                >
-                  Home
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrentView('dashboard')}
-                  className={`text-sm font-medium transition-colors pb-0.5 border-b-2 ${currentView === 'dashboard' ? 'text-teal-400 border-teal-400' : 'text-white/60 border-transparent hover:text-white'}`}
-                >
-                  Dashboard
-                </button>
-              </nav>
+    <NetworkGuard>
+      <div className="min-h-screen bg-white">
+        <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0a0f1e]/90 backdrop-blur-md">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 relative">
+            {/* Logo */}
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setCurrentView('home')}
+                className="flex items-center hover:opacity-80 transition-opacity"
+                aria-label="EarnButton home"
+              >
+                <Image src="/logo.svg" alt="EarnButton" width={140} height={32} priority />
+              </button>
+
+              {/* Desktop nav links */}
+              {isConnected && (
+                <nav className="hidden sm:flex items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentView('home')}
+                    className={`text-sm font-medium transition-colors pb-0.5 border-b-2 ${currentView === 'home' ? 'text-teal-400 border-teal-400' : 'text-white/60 border-transparent hover:text-white'}`}
+                  >
+                    Home
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentView('dashboard')}
+                    className={`text-sm font-medium transition-colors pb-0.5 border-b-2 ${currentView === 'dashboard' ? 'text-teal-400 border-teal-400' : 'text-white/60 border-transparent hover:text-white'}`}
+                  >
+                    Dashboard
+                  </button>
+                </nav>
+              )}
+            </div>
+
+            {/* Right side */}
+            <div className="flex items-center gap-3">
+              <Link
+                href="/demo"
+                className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-white/60 hover:text-teal-400 transition-colors"
+              >
+                For Developers →
+              </Link>
+              <ConnectButton />
+              {/* Hamburger — mobile only */}
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen((v) => !v)}
+                className="sm:hidden flex items-center justify-center h-9 w-9 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={mobileMenuOpen}
+              >
+                {mobileMenuOpen ? (
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </button>
+            </div>
+
+            {/* Mobile dropdown */}
+            {mobileMenuOpen && (
+              <MobileMenu
+                isConnected={isConnected}
+                currentView={currentView}
+                setCurrentView={setCurrentView}
+                onClose={() => setMobileMenuOpen(false)}
+              />
             )}
           </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/demo"
-              className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-white/60 hover:text-teal-400 transition-colors"
-            >
-              For Developers →
-            </Link>
-            <ConnectButton />
+        </header>
+
+        {isConnected && currentView === 'dashboard' ? (
+          <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+            <Dashboard
+              userAddress={address!}
+              onDeposit={() => openModal(YO_VAULTS[0].address)}
+              onDepositSuccess={(refetch) => setRefetchDashboard(() => refetch)}
+            />
           </div>
-        </div>
-      </header>
-
-      {isConnected && currentView === 'dashboard' ? (
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-          <Dashboard
-            userAddress={address!}
-            onDeposit={() => openModal(YO_VAULTS[0].address)}
-            onDepositSuccess={(refetch) => setRefetchDashboard(() => refetch)}
+        ) : (
+          <LandingPage
+            isConnected={isConnected}
+            onOpenModal={openModal}
+            apyMap={apyMap}
           />
-        </div>
-      ) : (
-        <LandingPage
-          isConnected={isConnected}
-          onOpenModal={openModal}
-          apyMap={apyMap}
+        )}
+
+        <EarnModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          vaultAddress={selectedVault}
+          onSuccess={handleModalSuccess}
         />
-      )}
 
-      <EarnModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        vaultAddress={selectedVault}
-        onSuccess={handleModalSuccess}
-      />
-
-      <AIAdvisor />
-    </div>
+        <AIAdvisor />
+      </div>
+    </NetworkGuard>
   )
 }
 
@@ -253,11 +343,12 @@ function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
             <h2 className="text-3xl font-black text-neutral-900">Choose your vault</h2>
             <p className="mt-2 text-neutral-500">Four assets. Real yield. All on Base.</p>
           </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {/* h-full on wrapper + items-stretch ensures equal card heights */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 items-stretch">
             {YO_VAULTS.map((vault, i) => (
               <div
                 key={vault.address}
-                className="animate-fade-up"
+                className="animate-fade-up h-full"
                 style={{ animationDelay: `${500 + i * 100}ms` }}
               >
                 <VaultInfo
@@ -360,9 +451,33 @@ function LandingPage({ isConnected, onOpenModal, apyMap }: LandingPageProps) {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0a0f1e] px-4 py-8 text-center text-xs text-white/30">
-        <p>EarnButton · Powered by YO Protocol · Built on Base</p>
-        <p className="mt-1">Not financial advice. DeFi involves risk. Always DYOR.</p>
+      <footer className="bg-[#0a0f1e] px-4 py-10 text-center text-xs text-white/30">
+        <div className="mx-auto max-w-4xl space-y-3">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-white/50">
+            <a href="https://yo.xyz" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+              yo.xyz
+            </a>
+            <span>·</span>
+            <a href="https://docs.yo.xyz" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+              Docs
+            </a>
+            <span>·</span>
+            <a
+              href="https://basescan.org/address/0x0000000f2eb9f69274678c76222b35eec7588a65"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors"
+            >
+              yoUSD on Basescan ↗
+            </a>
+            <span>·</span>
+            <Link href="/demo" className="hover:text-white transition-colors">
+              For Developers
+            </Link>
+          </div>
+          <p>EarnButton · Powered by YO Protocol · Built on Base</p>
+          <p>Not financial advice. DeFi involves risk. Always DYOR.</p>
+        </div>
       </footer>
     </main>
   )

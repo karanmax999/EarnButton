@@ -191,11 +191,18 @@ function TransactionStep({ title, description, txHash }: {
         </div>
         <p className="text-base font-semibold text-neutral-900">{title}</p>
         <p className="text-sm text-neutral-500">{description}</p>
-        {txHash && (
-          <div className="mt-1 flex flex-col items-center gap-1">
-            <span className="text-xs text-neutral-400">Transaction</span>
-            <TxLink hash={txHash} />
+        {txHash ? (
+          <div className="w-full rounded-xl bg-blue-50 border border-blue-100 px-4 py-3 space-y-2">
+            <p className="text-xs font-medium text-blue-700">
+              Transaction submitted — waiting for confirmation...
+            </p>
+            <div className="flex items-center justify-center gap-1.5">
+              <span className="text-xs text-blue-500">View on Basescan</span>
+              <TxLink hash={txHash} />
+            </div>
           </div>
+        ) : (
+          <p className="text-xs text-neutral-400">Waiting for wallet confirmation...</p>
         )}
       </div>
     </div>
@@ -322,10 +329,20 @@ const EarnModal: React.FC<EarnModalProps> = ({ isOpen, onClose, vaultAddress, on
     if (!amountInput) { setValidationError(null); return }
     const sanitized = sanitizeInput(amountInput.trim())
     const num = parseFloat(sanitized)
-    if (isNaN(num) || num <= 0) { setValidationError('Amount must be greater than zero'); return }
+    if (isNaN(num) || num <= 0) { setValidationError('Please enter an amount greater than 0'); return }
     const result = validateAmount(parsedAmount, assetBalance)
-    setValidationError(result.isValid ? null : (result.error ?? null))
-  }, [amountInput, parsedAmount, assetBalance])
+    if (!result.isValid) {
+      // Make insufficient balance message explicit with available amount
+      const available = (Number(assetBalance) / 10 ** assetDecimals).toFixed(assetDecimals === 6 ? 2 : 6)
+      setValidationError(
+        result.error?.toLowerCase().includes('insufficient') || result.error?.toLowerCase().includes('exceed')
+          ? `Insufficient balance. You have ${available} ${assetSymbol} available.`
+          : (result.error ?? null)
+      )
+    } else {
+      setValidationError(null)
+    }
+  }, [amountInput, parsedAmount, assetBalance, assetDecimals, assetSymbol])
 
   useEffect(() => {
     if (!depositHookError) return
