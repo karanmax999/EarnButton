@@ -208,3 +208,22 @@ export interface FundDeployment {
   /** Risk level of this deployment */
   riskLevel: RiskLevel
 }
+
+
+/**
+ * Agent Dashboard Types
+ * Re-exported from types/agent.ts for convenient access
+ */
+export type {
+  AgentIdentity,
+  TradeIntent,
+  RiskRating,
+  ValidationArtifact,
+  ReputationMetrics,
+  CapitalSandbox,
+  Trade,
+  AgentRegisterResponse,
+  TradeSubmitResponse,
+  ValidationRecordResponse,
+  ReputationResponse,
+} from './agent'
