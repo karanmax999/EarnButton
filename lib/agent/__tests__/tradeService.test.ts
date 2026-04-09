@@ -10,12 +10,14 @@ import {
   submitTrade,
   fetchTradeHistory,
   pollTradeStatus,
+  invalidateTradeHistoryCache,
 } from '../tradeService'
 import { TradeIntent, Trade } from '@/types/agent'
 
 describe('tradeService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    invalidateTradeHistoryCache('agent-123')
     global.fetch = vi.fn()
   })
 

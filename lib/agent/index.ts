@@ -52,3 +52,32 @@ export {
   claimCapital,
   pollClaimStatus,
 } from './sandboxService'
+
+export {
+  useAgentWallet,
+  useAgentData,
+  useWalletGuard,
+  useAgentDataCache,
+} from './walletHooks'
+
+export {
+  apiClient,
+  apiPost,
+  apiGet,
+  apiPut,
+  apiDelete,
+} from './apiClient'
+
+export {
+  validateEthereumAddress,
+  validatePositiveNumber,
+  validateAssetSupported,
+  validateTradeIntentComplete,
+  validateAmountWithinLimits,
+  validateApiResponseStructure,
+  sanitizeUserInput,
+  validateTransactionHash,
+  validatePercentage,
+  validateSharpeRatio,
+  validateDrawdownPercentage,
+} from './validation'

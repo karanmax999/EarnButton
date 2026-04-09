@@ -5,10 +5,15 @@
  * It handles fetching risk ratings for vaults and subscribing to real-time updates via polling.
  * Risk levels are mapped to color codes for visual display.
  * 
- * Requirements: 3.1, 3.8, 18.4
+ * Requirements: 3.1, 3.8, 18.4, 15.4-15.5
  */
 
 import { RiskRating } from '@/types/agent'
+
+// 60-second TTL cache for risk ratings (keyed by sorted vault addresses)
+const RISK_CACHE_TTL = 60000
+interface CacheEntry<T> { data: T; timestamp: number }
+const riskRatingsCache = new Map<string, CacheEntry<RiskRating[]>>()
 
 /**
  * Maps risk level to color code for UI display
@@ -53,6 +58,13 @@ export async function fetchRiskRatings(
   try {
     if (!vaultAddresses || vaultAddresses.length === 0) {
       return []
+    }
+
+    // Cache key: sorted vault addresses joined
+    const cacheKey = [...vaultAddresses].sort().join(',')
+    const cached = riskRatingsCache.get(cacheKey)
+    if (cached && Date.now() - cached.timestamp < RISK_CACHE_TTL) {
+      return cached.data
     }
 
     // In a real implementation, this would call the Credora API
@@ -103,10 +115,24 @@ export async function fetchRiskRatings(
       }
     })
 
+    // Store in TTL cache
+    riskRatingsCache.set(cacheKey, { data: ratings, timestamp: Date.now() })
+
     return ratings
   } catch (error) {
     console.error('Error fetching risk ratings:', error)
     return null
+  }
+}
+
+/**
+ * Clears the risk ratings cache. Useful for testing.
+ */
+export function clearRiskRatingsCache(cacheKey?: string): void {
+  if (cacheKey) {
+    riskRatingsCache.delete(cacheKey)
+  } else {
+    riskRatingsCache.clear()
   }
 }
 

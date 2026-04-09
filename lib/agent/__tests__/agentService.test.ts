@@ -10,12 +10,14 @@ import {
   registerAgent,
   fetchAgentIdentity,
   pollAgentRegistration,
+  clearAgentIdentityCache,
 } from '../agentService'
 import { AgentIdentity } from '@/types/agent'
 
 describe('agentService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    clearAgentIdentityCache()
     global.fetch = vi.fn()
   })
 

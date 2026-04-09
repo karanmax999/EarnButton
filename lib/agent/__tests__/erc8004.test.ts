@@ -6,12 +6,13 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { fetchReputationMetrics, subscribeToReputationUpdates } from '../erc8004'
+import { fetchReputationMetrics, subscribeToReputationUpdates, clearReputationCache } from '../erc8004'
 import { ReputationMetrics } from '@/types/agent'
 
 describe('erc8004 - ERC-8004 Reputation Registry Service', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    clearReputationCache()
   })
 
   afterEach(() => {

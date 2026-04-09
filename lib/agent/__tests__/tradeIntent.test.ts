@@ -22,8 +22,8 @@ const assetArbitrary = fc.stringMatching(/^[A-Z]{2,4}\/[A-Z]{2,4}$/)
 const amountArbitrary = fc.bigInt({ min: 1n, max: BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff') })
 const directionArbitrary = fc.oneof(fc.constant('buy' as const), fc.constant('sell' as const))
 const timestampArbitrary = fc.integer({ min: 0, max: Math.floor(Date.now() / 1000) })
-const signatureArbitrary = fc.option(fc.string({ minLength: 130, maxLength: 130 }))
-const priceProofArbitrary = fc.option(fc.string({ minLength: 100, maxLength: 200 }))
+const signatureArbitrary = fc.option(fc.string({ minLength: 130, maxLength: 130 }), { nil: undefined })
+const priceProofArbitrary = fc.option(fc.string({ minLength: 100, maxLength: 200 }), { nil: undefined })
 
 const tradeIntentArbitrary = fc.record({
   asset: assetArbitrary,

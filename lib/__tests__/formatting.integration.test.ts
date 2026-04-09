@@ -1,10 +1,9 @@
 /**
  * Integration test for formatting utilities
  * Demonstrates real-world usage scenarios
- * 
- * To run: npx tsx lib/__tests__/formatting.integration.test.ts
  */
 
+import { describe, it, expect } from 'vitest'
 import {
   formatUSDC,
   formatAPY,
@@ -14,67 +13,68 @@ import {
   formatTxHash
 } from '../formatting'
 
-console.log('\n=== Formatting Utilities Integration Test ===\n')
+describe('Formatting Utilities Integration', () => {
+  it('formats vault information correctly', () => {
+    const vaultAddress = '0x1234567890123456789012345678901234567890'
+    const tvl = 5_432_100_000_000n
+    const apy = 8.75
+    const minDeposit = 100_000_000n
 
-// Simulate a vault display
-console.log('--- Vault Information ---')
-const vaultAddress = '0x1234567890123456789012345678901234567890'
-const tvl = 5_432_100_000_000n // $5,432,100 USDC
-const apy = 8.75
-const minDeposit = 100_000_000n // $100 USDC
+    expect(formatAddress(vaultAddress)).toBe('0x1234...7890')
+    expect(formatUSDC(tvl)).toBe('5,432,100.00')
+    expect(formatLargeNumber(Number(tvl) / 1_000_000)).toBe('5.4M')
+    expect(formatAPY(apy)).toBe('8.75%')
+    expect(formatUSDC(minDeposit)).toBe('100.00')
+  })
 
-console.log(`Vault: ${formatAddress(vaultAddress)}`)
-console.log(`TVL: $${formatUSDC(tvl)} (${formatLargeNumber(Number(tvl) / 1_000_000)})`)
-console.log(`APY: ${formatAPY(apy)}`)
-console.log(`Min Deposit: $${formatUSDC(minDeposit)}`)
+  it('formats user position correctly', () => {
+    const userAddress = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd'
+    const depositedAmount = 10_000_000_000n
+    const currentValue = 10_875_000_000n
+    const yieldEarned = currentValue - depositedAmount
+    const depositedAt = 1705276800
 
-// Simulate a user position
-console.log('\n--- User Position ---')
-const userAddress = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd'
-const depositedAmount = 10_000_000_000n // $10,000 USDC
-const currentValue = 10_875_000_000n // $10,875 USDC
-const yieldEarned = currentValue - depositedAmount
-const depositedAt = 1705276800 // Jan 15, 2024
+    expect(formatAddress(userAddress)).toBe('0xabcd...abcd')
+    expect(formatUSDC(depositedAmount)).toBe('10,000.00')
+    expect(formatUSDC(currentValue)).toBe('10,875.00')
+    expect(formatUSDC(yieldEarned)).toBe('875.00')
+    expect(formatTimestamp(depositedAt)).toBe('Jan 15, 2024')
+  })
 
-console.log(`User: ${formatAddress(userAddress)}`)
-console.log(`Deposited: $${formatUSDC(depositedAmount)}`)
-console.log(`Current Value: $${formatUSDC(currentValue)}`)
-console.log(`Yield Earned: $${formatUSDC(yieldEarned)} (${formatAPY((Number(yieldEarned) / Number(depositedAmount)) * 100)})`)
-console.log(`Deposited On: ${formatTimestamp(depositedAt)}`)
+  it('formats transaction data correctly', () => {
+    const txHash = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+    const txTimestamp = 1706745600
+    const txAmount = 5_000_000_000n
 
-// Simulate a transaction
-console.log('\n--- Recent Transaction ---')
-const txHash = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-const txTimestamp = 1706745600 // Feb 1, 2024
-const txAmount = 5_000_000_000n // $5,000 USDC
+    expect(formatTxHash(txHash)).toBe('0x12345678...90abcdef')
+    expect(formatUSDC(txAmount)).toBe('5,000.00')
+    expect(formatTimestamp(txTimestamp)).toBe('Feb 1, 2024')
+  })
 
-console.log(`Transaction: ${formatTxHash(txHash)}`)
-console.log(`Amount: $${formatUSDC(txAmount)}`)
-console.log(`Date: ${formatTimestamp(txTimestamp)}`)
+  it('formats portfolio summary correctly', () => {
+    const totalDeposited = 25_000_000_000n
+    const totalValue = 27_125_000_000n
+    const totalYield = totalValue - totalDeposited
+    const weightedAPY = 7.25
 
-// Simulate portfolio summary
-console.log('\n--- Portfolio Summary ---')
-const totalDeposited = 25_000_000_000n // $25,000 USDC
-const totalValue = 27_125_000_000n // $27,125 USDC
-const totalYield = totalValue - totalDeposited
-const weightedAPY = 7.25
+    expect(formatUSDC(totalDeposited)).toBe('25,000.00')
+    expect(formatUSDC(totalValue)).toBe('27,125.00')
+    expect(formatUSDC(totalYield)).toBe('2,125.00')
+    expect(formatAPY(weightedAPY)).toBe('7.25%')
+  })
 
-console.log(`Total Deposited: $${formatUSDC(totalDeposited)}`)
-console.log(`Current Value: $${formatUSDC(totalValue)}`)
-console.log(`Total Yield: $${formatUSDC(totalYield)}`)
-console.log(`Weighted APY: ${formatAPY(weightedAPY)}`)
+  it('formats protocol allocations correctly', () => {
+    const protocols = [
+      { name: 'Aave', allocation: 15_000_000_000n, apy: 6.5 },
+      { name: 'Compound', allocation: 8_000_000_000n, apy: 7.2 },
+      { name: 'Yearn', allocation: 4_125_000_000n, apy: 9.8 }
+    ]
 
-// Simulate protocol allocations
-console.log('\n--- Protocol Allocations ---')
-const protocols = [
-  { name: 'Aave', allocation: 15_000_000_000n, apy: 6.5 },
-  { name: 'Compound', allocation: 8_000_000_000n, apy: 7.2 },
-  { name: 'Yearn', allocation: 4_125_000_000n, apy: 9.8 }
-]
-
-protocols.forEach(protocol => {
-  const percentage = (Number(protocol.allocation) / Number(totalValue)) * 100
-  console.log(`${protocol.name}: $${formatUSDC(protocol.allocation)} (${percentage.toFixed(1)}%) - ${formatAPY(protocol.apy)}`)
+    expect(formatUSDC(protocols[0].allocation)).toBe('15,000.00')
+    expect(formatAPY(protocols[0].apy)).toBe('6.50%')
+    expect(formatUSDC(protocols[1].allocation)).toBe('8,000.00')
+    expect(formatAPY(protocols[1].apy)).toBe('7.20%')
+    expect(formatUSDC(protocols[2].allocation)).toBe('4,125.00')
+    expect(formatAPY(protocols[2].apy)).toBe('9.80%')
+  })
 })
-
-console.log('\n✓ All formatting functions working correctly in real-world scenarios\n')

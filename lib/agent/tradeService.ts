@@ -4,10 +4,26 @@
  * This module provides functions to interact with trade submission and history management.
  * It handles submitting signed trade intents, fetching trade history, and polling for trade confirmation.
  * 
- * Requirements: 2.7, 7.1, 11.2
+ * Requirements: 2.7, 7.1, 11.2, 15.4-15.7
  */
 
 import { TradeIntent, Trade, TradeSubmitResponse } from '@/types/agent'
+
+// Pagination cache for trade history (keyed by agentId+page)
+interface CacheEntry<T> { data: T; timestamp: number }
+const tradeHistoryCache = new Map<string, CacheEntry<Trade[]>>()
+
+/**
+ * Invalidates trade history cache entries for a given agentId.
+ * Should be called after a new trade is submitted.
+ */
+export function invalidateTradeHistoryCache(agentId: string): void {
+  for (const key of tradeHistoryCache.keys()) {
+    if (key.startsWith(`${agentId}:`)) {
+      tradeHistoryCache.delete(key)
+    }
+  }
+}
 
 /**
  * Submits a signed trade intent to the trading system
@@ -145,6 +161,14 @@ export async function fetchTradeHistory(
       return []
     }
 
+    // Cache key: agentId + page (offset/limit)
+    const page = Math.floor(offset / limit)
+    const cacheKey = `${agentId}:${page}:${limit}`
+    const cached = tradeHistoryCache.get(cacheKey)
+    if (cached) {
+      return cached.data
+    }
+
     const params = new URLSearchParams({
       agentId,
       limit: limit.toString(),
@@ -194,6 +218,9 @@ export async function fetchTradeHistory(
         validationArtifacts: item.validationArtifacts,
       }
     })
+
+    // Store in pagination cache
+    tradeHistoryCache.set(cacheKey, { data: trades, timestamp: Date.now() })
 
     return trades
   } catch (error) {

@@ -5,10 +5,15 @@
  * It handles fetching reputation metrics (Sharpe ratio, drawdown, validation score) and
  * subscribing to real-time updates via polling.
  * 
- * Requirements: 5.1, 5.11, 18.1
+ * Requirements: 5.1, 5.11, 18.1, 15.4-15.5
  */
 
 import { ReputationMetrics } from '@/types/agent'
+
+// 30-second TTL cache for reputation metrics (per agentId)
+const REPUTATION_CACHE_TTL = 30000
+interface CacheEntry<T> { data: T; timestamp: number }
+const reputationCache = new Map<string, CacheEntry<ReputationMetrics>>()
 
 /**
  * Fetches reputation metrics for an agent from the ERC-8004 registry
@@ -33,6 +38,13 @@ export async function fetchReputationMetrics(
   try {
     // In a real implementation, this would query the ERC-8004 registry contract
     // For now, we simulate the API call
+
+    // Check 30-second TTL cache
+    const cached = reputationCache.get(agentId)
+    if (cached && Date.now() - cached.timestamp < REPUTATION_CACHE_TTL) {
+      return cached.data
+    }
+
     const response = await fetch(`/api/agent/reputation?agentId=${agentId}`)
     
     if (!response.ok) {
@@ -53,15 +65,31 @@ export async function fetchReputationMetrics(
       return null
     }
 
-    return {
+    const metrics: ReputationMetrics = {
       sharpeRatio: data.sharpeRatio,
       drawdownPercentage: data.drawdownPercentage,
       validationScore: data.validationScore,
       updatedAt: data.updatedAt,
     }
+
+    // Store in TTL cache
+    reputationCache.set(agentId, { data: metrics, timestamp: Date.now() })
+
+    return metrics
   } catch (error) {
     console.error('Error fetching reputation metrics:', error)
     return null
+  }
+}
+
+/**
+ * Clears the reputation metrics cache. Useful for testing.
+ */
+export function clearReputationCache(agentId?: string): void {
+  if (agentId) {
+    reputationCache.delete(agentId)
+  } else {
+    reputationCache.clear()
   }
 }
 

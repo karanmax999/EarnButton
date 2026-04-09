@@ -1,279 +1,179 @@
 /**
- * Manual tests for validation functions
- * These tests verify the core validation logic works correctly
- * 
- * To run: npx tsx lib/__tests__/validation.test.ts
+ * Tests for validation functions
  */
 
+import { describe, it, expect } from 'vitest'
 import { validateAddress, validateAmount, validateVaultMetadata, validateUserPosition, ValidationError } from '../validation'
 import type { VaultMetadata, UserPosition } from '@/types'
 
-// Test counter
-let passed = 0
-let failed = 0
+describe('validateAddress', () => {
+  it('validates correct Ethereum address', () => {
+    expect(validateAddress('0x1234567890123456789012345678901234567890')).toBe(true)
+  })
 
-function test(name: string, fn: () => void) {
-  try {
-    fn()
-    console.log(`✓ ${name}`)
-    passed++
-  } catch (error) {
-    console.error(`✗ ${name}`)
-    console.error(`  ${error}`)
-    failed++
-  }
-}
+  it('validates lowercase hex address', () => {
+    expect(validateAddress('0xabcdefabcdefabcdefabcdefabcdefabcdefabcd')).toBe(true)
+  })
 
-function assert(condition: boolean, message: string) {
-  if (!condition) {
-    throw new Error(message)
-  }
-}
+  it('validates uppercase hex address', () => {
+    expect(validateAddress('0xABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCD')).toBe(true)
+  })
 
-function assertEqual<T>(actual: T, expected: T, message?: string) {
-  if (actual !== expected) {
-    throw new Error(message || `Expected ${expected}, got ${actual}`)
-  }
-}
+  it('validates mixed case hex address', () => {
+    expect(validateAddress('0xAbCdEf1234567890AbCdEf1234567890AbCdEf12')).toBe(true)
+  })
 
-console.log('\n=== Testing validateAddress ===\n')
+  it('rejects address without 0x prefix', () => {
+    expect(validateAddress('1234567890123456789012345678901234567890')).toBe(false)
+  })
 
-test('validates correct Ethereum address', () => {
-  assert(validateAddress('0x1234567890123456789012345678901234567890'), 'Should accept valid address')
+  it('rejects address with wrong length', () => {
+    expect(validateAddress('0x12345')).toBe(false)
+    expect(validateAddress('0x12345678901234567890123456789012345678901234')).toBe(false)
+  })
+
+  it('rejects address with invalid characters', () => {
+    expect(validateAddress('0x123456789012345678901234567890123456789g')).toBe(false)
+    expect(validateAddress('0x123456789012345678901234567890123456789!')).toBe(false)
+  })
+
+  it('rejects non-string input', () => {
+    expect(validateAddress(123 as any)).toBe(false)
+    expect(validateAddress(null as any)).toBe(false)
+    expect(validateAddress(undefined as any)).toBe(false)
+  })
 })
 
-test('validates lowercase hex address', () => {
-  assert(validateAddress('0xabcdefabcdefabcdefabcdefabcdefabcdefabcd'), 'Should accept lowercase hex')
+describe('validateAmount', () => {
+  it('validates positive amount within balance', () => {
+    const result = validateAmount(100n, 1000n)
+    expect(result.isValid).toBe(true)
+    expect(result.error).toBeFalsy()
+  })
+
+  it('validates amount equal to balance', () => {
+    const result = validateAmount(1000n, 1000n)
+    expect(result.isValid).toBe(true)
+  })
+
+  it('rejects zero amount', () => {
+    const result = validateAmount(0n, 1000n)
+    expect(result.isValid).toBe(false)
+    expect(result.error).toBe('Amount must be greater than zero')
+  })
+
+  it('rejects negative amount', () => {
+    const result = validateAmount(-100n, 1000n)
+    expect(result.isValid).toBe(false)
+    expect(result.error).toBe('Amount must be greater than zero')
+  })
+
+  it('rejects amount exceeding balance', () => {
+    const result = validateAmount(2000n, 1000n)
+    expect(result.isValid).toBe(false)
+    expect(result.error).toBe('Amount exceeds available balance')
+  })
 })
 
-test('validates uppercase hex address', () => {
-  assert(validateAddress('0xABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCD'), 'Should accept uppercase hex')
-})
-
-test('validates mixed case hex address', () => {
-  assert(validateAddress('0xAbCdEf1234567890AbCdEf1234567890AbCdEf12'), 'Should accept mixed case hex')
-})
-
-test('rejects address without 0x prefix', () => {
-  assert(!validateAddress('1234567890123456789012345678901234567890'), 'Should reject address without 0x')
-})
-
-test('rejects address with wrong length', () => {
-  assert(!validateAddress('0x12345'), 'Should reject short address')
-  assert(!validateAddress('0x12345678901234567890123456789012345678901234'), 'Should reject long address')
-})
-
-test('rejects address with invalid characters', () => {
-  assert(!validateAddress('0x123456789012345678901234567890123456789g'), 'Should reject non-hex characters')
-  assert(!validateAddress('0x123456789012345678901234567890123456789!'), 'Should reject special characters')
-})
-
-test('rejects non-string input', () => {
-  assert(!validateAddress(123 as any), 'Should reject number')
-  assert(!validateAddress(null as any), 'Should reject null')
-  assert(!validateAddress(undefined as any), 'Should reject undefined')
-})
-
-console.log('\n=== Testing validateAmount ===\n')
-
-test('validates positive amount within balance', () => {
-  const result = validateAmount(100n, 1000n)
-  assert(result.isValid, 'Should accept valid amount')
-  assert(!result.error, 'Should not have error')
-})
-
-test('validates amount equal to balance', () => {
-  const result = validateAmount(1000n, 1000n)
-  assert(result.isValid, 'Should accept amount equal to balance')
-})
-
-test('rejects zero amount', () => {
-  const result = validateAmount(0n, 1000n)
-  assert(!result.isValid, 'Should reject zero amount')
-  assert(result.error === 'Amount must be greater than zero', 'Should have correct error message')
-})
-
-test('rejects negative amount', () => {
-  const result = validateAmount(-100n, 1000n)
-  assert(!result.isValid, 'Should reject negative amount')
-  assert(result.error === 'Amount must be greater than zero', 'Should have correct error message')
-})
-
-test('rejects amount exceeding balance', () => {
-  const result = validateAmount(2000n, 1000n)
-  assert(!result.isValid, 'Should reject amount exceeding balance')
-  assert(result.error === 'Amount exceeds available balance', 'Should have correct error message')
-})
-
-console.log('\n=== Testing validateVaultMetadata ===\n')
-
-const validVaultMetadata: VaultMetadata = {
-  address: '0x1234567890123456789012345678901234567890',
-  name: 'Test Vault',
-  symbol: 'TVAULT',
-  apy: 5.5,
-  riskLevel: 'Low',
-  tvl: 1000000n,
-  strategy: 'Conservative yield strategy',
-  underlyingAsset: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
-  minDeposit: 100n,
-  maxDeposit: 10000n,
-  depositFee: 0.5,
-  withdrawalFee: 0.5,
-  performanceFee: 10
-}
-
-test('validates correct vault metadata', () => {
-  validateVaultMetadata(validVaultMetadata)
-})
-
-test('rejects invalid vault address', () => {
-  try {
-    validateVaultMetadata({ ...validVaultMetadata, address: 'invalid' })
-    throw new Error('Should have thrown ValidationError')
-  } catch (error) {
-    assert(error instanceof ValidationError, 'Should throw ValidationError')
-    assert((error as ValidationError).message === 'Invalid vault address', 'Should have correct error message')
-  }
-})
-
-test('rejects empty vault name', () => {
-  try {
-    validateVaultMetadata({ ...validVaultMetadata, name: '' })
-    throw new Error('Should have thrown ValidationError')
-  } catch (error) {
-    assert(error instanceof ValidationError, 'Should throw ValidationError')
-  }
-})
-
-test('rejects negative APY', () => {
-  try {
-    validateVaultMetadata({ ...validVaultMetadata, apy: -5 })
-    throw new Error('Should have thrown ValidationError')
-  } catch (error) {
-    assert(error instanceof ValidationError, 'Should throw ValidationError')
-  }
-})
-
-test('rejects invalid risk level', () => {
-  try {
-    validateVaultMetadata({ ...validVaultMetadata, riskLevel: 'Invalid' as any })
-    throw new Error('Should have thrown ValidationError')
-  } catch (error) {
-    assert(error instanceof ValidationError, 'Should throw ValidationError')
-  }
-})
-
-test('rejects negative TVL', () => {
-  try {
-    validateVaultMetadata({ ...validVaultMetadata, tvl: -1000n })
-    throw new Error('Should have thrown ValidationError')
-  } catch (error) {
-    assert(error instanceof ValidationError, 'Should throw ValidationError')
-  }
-})
-
-test('rejects minDeposit > maxDeposit', () => {
-  try {
-    validateVaultMetadata({ ...validVaultMetadata, minDeposit: 10000n, maxDeposit: 100n })
-    throw new Error('Should have thrown ValidationError')
-  } catch (error) {
-    assert(error instanceof ValidationError, 'Should throw ValidationError')
-  }
-})
-
-test('rejects invalid fee values', () => {
-  try {
-    validateVaultMetadata({ ...validVaultMetadata, depositFee: -1 })
-    throw new Error('Should have thrown ValidationError')
-  } catch (error) {
-    assert(error instanceof ValidationError, 'Should throw ValidationError')
+describe('validateVaultMetadata', () => {
+  const validVaultMetadata: VaultMetadata = {
+    address: '0x1234567890123456789012345678901234567890',
+    name: 'Test Vault',
+    symbol: 'TVAULT',
+    apy: 5.5,
+    riskLevel: 'Low',
+    tvl: 1000000n,
+    strategy: 'Conservative yield strategy',
+    underlyingAsset: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
+    minDeposit: 100n,
+    maxDeposit: 10000n,
+    depositFee: 0.5,
+    withdrawalFee: 0.5,
+    performanceFee: 10
   }
 
-  try {
-    validateVaultMetadata({ ...validVaultMetadata, withdrawalFee: 101 })
-    throw new Error('Should have thrown ValidationError')
-  } catch (error) {
-    assert(error instanceof ValidationError, 'Should throw ValidationError')
-  }
+  it('validates correct vault metadata', () => {
+    expect(() => validateVaultMetadata(validVaultMetadata)).not.toThrow()
+  })
+
+  it('rejects invalid vault address', () => {
+    expect(() => validateVaultMetadata({ ...validVaultMetadata, address: 'invalid' }))
+      .toThrow(ValidationError)
+  })
+
+  it('rejects empty vault name', () => {
+    expect(() => validateVaultMetadata({ ...validVaultMetadata, name: '' }))
+      .toThrow(ValidationError)
+  })
+
+  it('rejects negative APY', () => {
+    expect(() => validateVaultMetadata({ ...validVaultMetadata, apy: -5 }))
+      .toThrow(ValidationError)
+  })
+
+  it('rejects invalid risk level', () => {
+    expect(() => validateVaultMetadata({ ...validVaultMetadata, riskLevel: 'Invalid' as any }))
+      .toThrow(ValidationError)
+  })
+
+  it('rejects negative TVL', () => {
+    expect(() => validateVaultMetadata({ ...validVaultMetadata, tvl: -1000n }))
+      .toThrow(ValidationError)
+  })
+
+  it('rejects minDeposit > maxDeposit', () => {
+    expect(() => validateVaultMetadata({ ...validVaultMetadata, minDeposit: 10000n, maxDeposit: 100n }))
+      .toThrow(ValidationError)
+  })
+
+  it('rejects invalid fee values', () => {
+    expect(() => validateVaultMetadata({ ...validVaultMetadata, depositFee: -1 }))
+      .toThrow(ValidationError)
+    expect(() => validateVaultMetadata({ ...validVaultMetadata, withdrawalFee: 101 }))
+      .toThrow(ValidationError)
+  })
 })
 
-console.log('\n=== Testing validateUserPosition ===\n')
-
-const validUserPosition: UserPosition = {
-  vaultAddress: '0x1234567890123456789012345678901234567890',
-  userAddress: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
-  shares: 1000n,
-  depositedAmount: 10000n,
-  currentValue: 11000n,
-  yieldEarned: 1000n,
-  depositedAt: 1640000000,
-  lastUpdated: 1640100000
-}
-
-test('validates correct user position', () => {
-  validateUserPosition(validUserPosition)
-})
-
-test('rejects invalid vault address', () => {
-  try {
-    validateUserPosition({ ...validUserPosition, vaultAddress: 'invalid' })
-    throw new Error('Should have thrown ValidationError')
-  } catch (error) {
-    assert(error instanceof ValidationError, 'Should throw ValidationError')
-  }
-})
-
-test('rejects invalid user address', () => {
-  try {
-    validateUserPosition({ ...validUserPosition, userAddress: 'invalid' })
-    throw new Error('Should have thrown ValidationError')
-  } catch (error) {
-    assert(error instanceof ValidationError, 'Should throw ValidationError')
-  }
-})
-
-test('rejects negative shares', () => {
-  try {
-    validateUserPosition({ ...validUserPosition, shares: -100n })
-    throw new Error('Should have thrown ValidationError')
-  } catch (error) {
-    assert(error instanceof ValidationError, 'Should throw ValidationError')
-  }
-})
-
-test('rejects invalid timestamps', () => {
-  try {
-    validateUserPosition({ ...validUserPosition, depositedAt: -1 })
-    throw new Error('Should have thrown ValidationError')
-  } catch (error) {
-    assert(error instanceof ValidationError, 'Should throw ValidationError')
+describe('validateUserPosition', () => {
+  const validUserPosition: UserPosition = {
+    vaultAddress: '0x1234567890123456789012345678901234567890',
+    userAddress: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
+    shares: 1000n,
+    depositedAmount: 10000n,
+    currentValue: 11000n,
+    yieldEarned: 1000n,
+    depositedAt: 1640000000,
+    lastUpdated: 1640100000
   }
 
-  try {
-    validateUserPosition({ ...validUserPosition, lastUpdated: validUserPosition.depositedAt - 1 })
-    throw new Error('Should have thrown ValidationError')
-  } catch (error) {
-    assert(error instanceof ValidationError, 'Should throw ValidationError')
-  }
+  it('validates correct user position', () => {
+    expect(() => validateUserPosition(validUserPosition)).not.toThrow()
+  })
+
+  it('rejects invalid vault address', () => {
+    expect(() => validateUserPosition({ ...validUserPosition, vaultAddress: 'invalid' }))
+      .toThrow(ValidationError)
+  })
+
+  it('rejects invalid user address', () => {
+    expect(() => validateUserPosition({ ...validUserPosition, userAddress: 'invalid' }))
+      .toThrow(ValidationError)
+  })
+
+  it('rejects negative shares', () => {
+    expect(() => validateUserPosition({ ...validUserPosition, shares: -100n }))
+      .toThrow(ValidationError)
+  })
+
+  it('rejects invalid timestamps', () => {
+    expect(() => validateUserPosition({ ...validUserPosition, depositedAt: -1 }))
+      .toThrow(ValidationError)
+    expect(() => validateUserPosition({ ...validUserPosition, lastUpdated: validUserPosition.depositedAt - 1 }))
+      .toThrow(ValidationError)
+  })
+
+  it('rejects incorrect yield calculation', () => {
+    expect(() => validateUserPosition({ ...validUserPosition, yieldEarned: 500n }))
+      .toThrow(ValidationError)
+  })
 })
-
-test('rejects incorrect yield calculation', () => {
-  try {
-    validateUserPosition({ ...validUserPosition, yieldEarned: 500n })
-    throw new Error('Should have thrown ValidationError')
-  } catch (error) {
-    assert(error instanceof ValidationError, 'Should throw ValidationError')
-    assert((error as ValidationError).message.includes('Yield earned must equal'), 'Should have correct error message')
-  }
-})
-
-// Print summary
-console.log('\n=== Test Summary ===\n')
-console.log(`Passed: ${passed}`)
-console.log(`Failed: ${failed}`)
-console.log(`Total: ${passed + failed}\n`)
-
-if (failed > 0) {
-  process.exit(1)
-}

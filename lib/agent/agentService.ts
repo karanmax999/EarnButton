@@ -5,11 +5,25 @@
  * It handles registering agents with ERC-721 identity NFTs, fetching agent identity from the blockchain,
  * and polling for registration confirmation.
  * 
- * Requirements: 1.2, 1.3, 1.4, 1.8, 11.1
+ * Requirements: 1.2, 1.3, 1.4, 1.8, 11.1, 15.4-15.5
  */
 
 import { AgentIdentity, AgentRegisterResponse } from '@/types/agent'
 
+// Session-level cache for agent identity (per wallet address)
+const agentIdentityCache = new Map<string, AgentIdentity>()
+
+/**
+ * Clears the agent identity cache for a specific wallet address or all entries.
+ * Useful for testing and forced refresh scenarios.
+ */
+export function clearAgentIdentityCache(walletAddress?: string): void {
+  if (walletAddress) {
+    agentIdentityCache.delete(walletAddress)
+  } else {
+    agentIdentityCache.clear()
+  }
+}
 /**
  * Registers a new agent with an ERC-721 identity NFT
  * 
@@ -69,6 +83,9 @@ export async function registerAgent(
       throw new Error('Invalid registration response structure')
     }
 
+    // Invalidate cache for this wallet on registration
+    agentIdentityCache.delete(walletAddress)
+
     return {
       success: data.success,
       agentId: data.agentId,
@@ -112,6 +129,11 @@ export async function fetchAgentIdentity(
       return null
     }
 
+    // Return cached identity if available (session-level cache)
+    if (agentIdentityCache.has(walletAddress)) {
+      return agentIdentityCache.get(walletAddress)!
+    }
+
     const response = await fetch(
       `/api/agent/identity?walletAddress=${encodeURIComponent(walletAddress)}`
     )
@@ -141,7 +163,7 @@ export async function fetchAgentIdentity(
       return null
     }
 
-    return {
+    const identity: AgentIdentity = {
       id: data.id,
       name: data.name,
       walletAddress: data.walletAddress,
@@ -150,6 +172,11 @@ export async function fetchAgentIdentity(
       registeredAt: data.registeredAt,
       status: data.status,
     }
+
+    // Store in session cache
+    agentIdentityCache.set(walletAddress, identity)
+
+    return identity
   } catch (error) {
     console.error('Error fetching agent identity:', error)
     return null

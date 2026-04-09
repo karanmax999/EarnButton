@@ -101,6 +101,13 @@ function MobileMenu({
             >
               Dashboard
             </button>
+            <Link
+              href="/agent"
+              onClick={onClose}
+              className="text-left px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:text-teal-400 hover:bg-white/5 transition-colors"
+            >
+              Agent
+            </Link>
           </>
         )}
         <Link
@@ -183,6 +190,12 @@ export default function Home() {
                   >
                     Dashboard
                   </button>
+                  <Link
+                    href="/agent"
+                    className="text-sm font-medium transition-colors pb-0.5 border-b-2 text-white/60 border-transparent hover:text-teal-400"
+                  >
+                    Agent
+                  </Link>
                 </nav>
               )}
             </div>

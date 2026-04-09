@@ -6,12 +6,13 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { fetchRiskRatings, subscribeToRiskUpdates, mapRiskLevelToColor } from '../credora'
+import { fetchRiskRatings, subscribeToRiskUpdates, mapRiskLevelToColor, clearRiskRatingsCache } from '../credora'
 import { RiskRating } from '@/types/agent'
 
 describe('credora - Credora Risk Rating Service', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    clearRiskRatingsCache()
   })
 
   afterEach(() => {

@@ -1,10 +1,8 @@
 /**
- * Manual tests for formatting functions
- * These tests verify the formatting utilities work correctly
- * 
- * To run: npx tsx lib/__tests__/formatting.test.ts
+ * Tests for formatting functions
  */
 
+import { describe, it, expect } from 'vitest'
 import {
   formatUSDC,
   formatAPY,
@@ -14,230 +12,180 @@ import {
   formatTxHash
 } from '../formatting'
 
-// Test counter
-let passed = 0
-let failed = 0
+describe('formatUSDC', () => {
+  it('formats zero USDC', () => {
+    expect(formatUSDC(0n)).toBe('0.00')
+  })
 
-function test(name: string, fn: () => void) {
-  try {
-    fn()
-    console.log(`✓ ${name}`)
-    passed++
-  } catch (error) {
-    console.error(`✗ ${name}`)
-    console.error(`  ${error}`)
-    failed++
-  }
-}
+  it('formats small USDC amount', () => {
+    expect(formatUSDC(1_000_000n)).toBe('1.00')
+  })
 
-function assertEqual<T>(actual: T, expected: T, message?: string) {
-  if (actual !== expected) {
-    throw new Error(message || `Expected "${expected}", got "${actual}"`)
-  }
-}
+  it('formats USDC with cents', () => {
+    expect(formatUSDC(1_234_560n)).toBe('1.23')
+  })
 
-console.log('\n=== Testing formatUSDC ===\n')
+  it('formats large USDC amount with comma separators', () => {
+    expect(formatUSDC(1_234_567_890n)).toBe('1,234.57')
+  })
 
-test('formats zero USDC', () => {
-  assertEqual(formatUSDC(0n), '0.00')
+  it('formats USDC with thousands separator', () => {
+    expect(formatUSDC(10_000_000_000n)).toBe('10,000.00')
+  })
+
+  it('formats USDC with millions', () => {
+    expect(formatUSDC(1_000_000_000_000n)).toBe('1,000,000.00')
+  })
+
+  it('formats fractional USDC correctly', () => {
+    expect(formatUSDC(500_000n)).toBe('0.50')
+  })
+
+  it('formats USDC with proper rounding', () => {
+    expect(formatUSDC(1_235_000n)).toBe('1.24')
+  })
 })
 
-test('formats small USDC amount', () => {
-  assertEqual(formatUSDC(1_000_000n), '1.00')
+describe('formatAPY', () => {
+  it('formats zero APY', () => {
+    expect(formatAPY(0)).toBe('0.00%')
+  })
+
+  it('formats single digit APY', () => {
+    expect(formatAPY(5)).toBe('5.00%')
+  })
+
+  it('formats APY with decimals', () => {
+    expect(formatAPY(5.5)).toBe('5.50%')
+  })
+
+  it('formats APY with two decimal places', () => {
+    expect(formatAPY(12.34)).toBe('12.34%')
+  })
+
+  it('formats APY with rounding', () => {
+    expect(formatAPY(5.555)).toBe('5.55%')
+  })
+
+  it('formats large APY', () => {
+    expect(formatAPY(123.45)).toBe('123.45%')
+  })
+
+  it('formats negative APY', () => {
+    expect(formatAPY(-2.5)).toBe('-2.50%')
+  })
 })
 
-test('formats USDC with cents', () => {
-  assertEqual(formatUSDC(1_234_560n), '1.23')
+describe('formatAddress', () => {
+  it('formats standard Ethereum address', () => {
+    expect(formatAddress('0x1234567890123456789012345678901234567890')).toBe('0x1234...7890')
+  })
+
+  it('formats address with lowercase hex', () => {
+    expect(formatAddress('0xabcdefabcdefabcdefabcdefabcdefabcdefabcd')).toBe('0xabcd...abcd')
+  })
+
+  it('formats address with uppercase hex', () => {
+    expect(formatAddress('0xABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCD')).toBe('0xABCD...ABCD')
+  })
+
+  it('formats address with mixed case', () => {
+    expect(formatAddress('0xAbCdEf1234567890AbCdEf1234567890AbCdEf12')).toBe('0xAbCd...Ef12')
+  })
+
+  it('returns short string unchanged', () => {
+    expect(formatAddress('0x123')).toBe('0x123')
+  })
+
+  it('returns empty string unchanged', () => {
+    expect(formatAddress('')).toBe('')
+  })
 })
 
-test('formats large USDC amount with comma separators', () => {
-  assertEqual(formatUSDC(1_234_567_890n), '1,234.57')
+describe('formatLargeNumber', () => {
+  it('formats small number without suffix', () => {
+    expect(formatLargeNumber(0)).toBe('0')
+    expect(formatLargeNumber(100)).toBe('100')
+    expect(formatLargeNumber(999)).toBe('999')
+  })
+
+  it('formats thousands with K suffix', () => {
+    expect(formatLargeNumber(1_000)).toBe('1.0K')
+    expect(formatLargeNumber(1_500)).toBe('1.5K')
+    expect(formatLargeNumber(10_000)).toBe('10.0K')
+    expect(formatLargeNumber(999_999)).toBe('1000.0K')
+  })
+
+  it('formats millions with M suffix', () => {
+    expect(formatLargeNumber(1_000_000)).toBe('1.0M')
+    expect(formatLargeNumber(2_500_000)).toBe('2.5M')
+    expect(formatLargeNumber(10_000_000)).toBe('10.0M')
+    expect(formatLargeNumber(123_456_789)).toBe('123.5M')
+  })
+
+  it('formats bigint values', () => {
+    expect(formatLargeNumber(1_000n)).toBe('1.0K')
+    expect(formatLargeNumber(1_000_000n)).toBe('1.0M')
+    expect(formatLargeNumber(500n)).toBe('500')
+  })
+
+  it('formats edge case at 1000 boundary', () => {
+    expect(formatLargeNumber(999)).toBe('999')
+    expect(formatLargeNumber(1_000)).toBe('1.0K')
+  })
+
+  it('formats edge case at 1M boundary', () => {
+    expect(formatLargeNumber(999_999)).toBe('1000.0K')
+    expect(formatLargeNumber(1_000_000)).toBe('1.0M')
+  })
 })
 
-test('formats USDC with thousands separator', () => {
-  assertEqual(formatUSDC(10_000_000_000n), '10,000.00')
+describe('formatTimestamp', () => {
+  it('formats timestamp to human-readable date', () => {
+    expect(formatTimestamp(1705276800)).toBe('Jan 15, 2024')
+  })
+
+  it('formats different months correctly', () => {
+    expect(formatTimestamp(1706745600)).toBe('Feb 1, 2024')
+    expect(formatTimestamp(1709251200)).toBe('Mar 1, 2024')
+    expect(formatTimestamp(1735603200)).toBe('Dec 31, 2024')
+  })
+
+  it('formats year 2023', () => {
+    expect(formatTimestamp(1672531200)).toBe('Jan 1, 2023')
+  })
+
+  it('formats year 2025', () => {
+    expect(formatTimestamp(1735689600)).toBe('Jan 1, 2025')
+  })
+
+  it('formats double-digit day', () => {
+    expect(formatTimestamp(1706140800)).toBe('Jan 25, 2024')
+  })
 })
 
-test('formats USDC with millions', () => {
-  assertEqual(formatUSDC(1_000_000_000_000n), '1,000,000.00')
+describe('formatTxHash', () => {
+  it('formats standard transaction hash', () => {
+    expect(formatTxHash('0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef')).toBe('0x12345678...90abcdef')
+  })
+
+  it('formats transaction hash with all lowercase', () => {
+    expect(formatTxHash('0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd')).toBe('0xabcdefab...cdefabcd')
+  })
+
+  it('formats transaction hash with all uppercase', () => {
+    expect(formatTxHash('0xABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCD')).toBe('0xABCDEFAB...CDEFABCD')
+  })
+
+  it('formats transaction hash with mixed case', () => {
+    expect(formatTxHash('0xAbCdEf1234567890AbCdEf1234567890AbCdEf1234567890AbCdEf1234567890')).toBe('0xAbCdEf12...34567890')
+  })
+
+  it('returns short string unchanged', () => {
+    expect(formatTxHash('0x123')).toBe('0x123')
+  })
+
+  it('returns empty string unchanged', () => {
+    expect(formatTxHash('')).toBe('')
+  })
 })
-
-test('formats fractional USDC correctly', () => {
-  assertEqual(formatUSDC(500_000n), '0.50')
-})
-
-test('formats USDC with proper rounding', () => {
-  assertEqual(formatUSDC(1_235_000n), '1.24')
-})
-
-console.log('\n=== Testing formatAPY ===\n')
-
-test('formats zero APY', () => {
-  assertEqual(formatAPY(0), '0.00%')
-})
-
-test('formats single digit APY', () => {
-  assertEqual(formatAPY(5), '5.00%')
-})
-
-test('formats APY with decimals', () => {
-  assertEqual(formatAPY(5.5), '5.50%')
-})
-
-test('formats APY with two decimal places', () => {
-  assertEqual(formatAPY(12.34), '12.34%')
-})
-
-test('formats APY with rounding', () => {
-  // Note: toFixed uses banker's rounding (round half to even)
-  // 5.555 rounds to 5.55 (not 5.56) due to floating point representation
-  assertEqual(formatAPY(5.555), '5.55%')
-})
-
-test('formats large APY', () => {
-  assertEqual(formatAPY(123.45), '123.45%')
-})
-
-test('formats negative APY', () => {
-  assertEqual(formatAPY(-2.5), '-2.50%')
-})
-
-console.log('\n=== Testing formatAddress ===\n')
-
-test('formats standard Ethereum address', () => {
-  const address = '0x1234567890123456789012345678901234567890'
-  assertEqual(formatAddress(address), '0x1234...7890')
-})
-
-test('formats address with lowercase hex', () => {
-  const address = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd'
-  assertEqual(formatAddress(address), '0xabcd...abcd')
-})
-
-test('formats address with uppercase hex', () => {
-  const address = '0xABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCD'
-  assertEqual(formatAddress(address), '0xABCD...ABCD')
-})
-
-test('formats address with mixed case', () => {
-  const address = '0xAbCdEf1234567890AbCdEf1234567890AbCdEf12'
-  assertEqual(formatAddress(address), '0xAbCd...Ef12')
-})
-
-test('returns short string unchanged', () => {
-  assertEqual(formatAddress('0x123'), '0x123')
-})
-
-test('returns empty string unchanged', () => {
-  assertEqual(formatAddress(''), '')
-})
-
-console.log('\n=== Testing formatLargeNumber ===\n')
-
-test('formats small number without suffix', () => {
-  assertEqual(formatLargeNumber(0), '0')
-  assertEqual(formatLargeNumber(100), '100')
-  assertEqual(formatLargeNumber(999), '999')
-})
-
-test('formats thousands with K suffix', () => {
-  assertEqual(formatLargeNumber(1_000), '1.0K')
-  assertEqual(formatLargeNumber(1_500), '1.5K')
-  assertEqual(formatLargeNumber(10_000), '10.0K')
-  assertEqual(formatLargeNumber(999_999), '1000.0K')
-})
-
-test('formats millions with M suffix', () => {
-  assertEqual(formatLargeNumber(1_000_000), '1.0M')
-  assertEqual(formatLargeNumber(2_500_000), '2.5M')
-  assertEqual(formatLargeNumber(10_000_000), '10.0M')
-  assertEqual(formatLargeNumber(123_456_789), '123.5M')
-})
-
-test('formats bigint values', () => {
-  assertEqual(formatLargeNumber(1_000n), '1.0K')
-  assertEqual(formatLargeNumber(1_000_000n), '1.0M')
-  assertEqual(formatLargeNumber(500n), '500')
-})
-
-test('formats edge case at 1000 boundary', () => {
-  assertEqual(formatLargeNumber(999), '999')
-  assertEqual(formatLargeNumber(1_000), '1.0K')
-})
-
-test('formats edge case at 1M boundary', () => {
-  assertEqual(formatLargeNumber(999_999), '1000.0K')
-  assertEqual(formatLargeNumber(1_000_000), '1.0M')
-})
-
-console.log('\n=== Testing formatTimestamp ===\n')
-
-test('formats timestamp to human-readable date', () => {
-  // Jan 15, 2024 00:00:00 UTC
-  const timestamp = 1705276800
-  assertEqual(formatTimestamp(timestamp), 'Jan 15, 2024')
-})
-
-test('formats different months correctly', () => {
-  // Feb 1, 2024
-  assertEqual(formatTimestamp(1706745600), 'Feb 1, 2024')
-  // Mar 1, 2024
-  assertEqual(formatTimestamp(1709251200), 'Mar 1, 2024')
-  // Dec 31, 2024
-  assertEqual(formatTimestamp(1735603200), 'Dec 31, 2024')
-})
-
-test('formats year 2023', () => {
-  // Jan 1, 2023
-  assertEqual(formatTimestamp(1672531200), 'Jan 1, 2023')
-})
-
-test('formats year 2025', () => {
-  // Jan 1, 2025
-  assertEqual(formatTimestamp(1735689600), 'Jan 1, 2025')
-})
-
-test('formats double-digit day', () => {
-  // Jan 25, 2024
-  assertEqual(formatTimestamp(1706140800), 'Jan 25, 2024')
-})
-
-console.log('\n=== Testing formatTxHash ===\n')
-
-test('formats standard transaction hash', () => {
-  const txHash = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-  assertEqual(formatTxHash(txHash), '0x12345678...90abcdef')
-})
-
-test('formats transaction hash with all lowercase', () => {
-  const txHash = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd'
-  assertEqual(formatTxHash(txHash), '0xabcdefab...cdefabcd')
-})
-
-test('formats transaction hash with all uppercase', () => {
-  const txHash = '0xABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCD'
-  assertEqual(formatTxHash(txHash), '0xABCDEFAB...CDEFABCD')
-})
-
-test('formats transaction hash with mixed case', () => {
-  const txHash = '0xAbCdEf1234567890AbCdEf1234567890AbCdEf1234567890AbCdEf1234567890'
-  assertEqual(formatTxHash(txHash), '0xAbCdEf12...34567890')
-})
-
-test('returns short string unchanged', () => {
-  assertEqual(formatTxHash('0x123'), '0x123')
-})
-
-test('returns empty string unchanged', () => {
-  assertEqual(formatTxHash(''), '')
-})
-
-// Print summary
-console.log('\n=== Test Summary ===\n')
-console.log(`Passed: ${passed}`)
-console.log(`Failed: ${failed}`)
-console.log(`Total: ${passed + failed}\n`)
-
-if (failed > 0) {
-  process.exit(1)
-}
